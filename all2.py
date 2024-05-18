@@ -1,3 +1,4 @@
+#for webiste
 import pyttsx3
 import streamlit as st
 import pandas as pd
@@ -5,6 +6,7 @@ import os
 from googletrans import Translator
 import requests
 from io import StringIO
+from github import Github
 
 # Initialize translator
 translator = Translator()
@@ -18,12 +20,20 @@ def load_dictionary(file_url):
     else:
         return pd.DataFrame(columns=['German', 'English'])
 
-# Function to save dictionary to file
-def save_dictionary(file_path, df):
-    df.to_csv(file_path, index=False)
 
 # GitHub raw URL for the dictionary CSV file
 github_csv_url = "https://raw.githubusercontent.com/rajan2012/german2english/main/german_english_dictionary.csv"
+
+
+# Function to save dictionary to file
+# Function to save dictionary to file in GitHub repository
+def save_dictionary_to_github(file_url, df):
+    csv_content = df.to_csv(index=False)
+    response = requests.put(file_url, data=csv_content)
+    if response.status_code == 200:
+        st.success("Dictionary updated successfully on GitHub.")
+    else:
+        st.error("Failed to update dictionary on GitHub.")
 
 # Load existing dictionary
 dictionary_df = load_dictionary(github_csv_url)
@@ -33,6 +43,7 @@ if 'current_index' not in st.session_state:
     st.session_state.current_index = 0
 if 'flipped' not in st.session_state:
     st.session_state.flipped = False
+
 
 # Function to render the flashcard
 def render_flashcard(index, flipped):
@@ -67,6 +78,15 @@ def render_flashcard(index, flipped):
             </div>
             """, unsafe_allow_html=True
         )
+        return display_word
+
+
+# Function to pronounce the word
+def pronounce_word(word):
+    engine = pyttsx3.init()
+    engine.say(word)
+    engine.runAndWait()
+
 
 # Streamlit app
 st.title('Translation Dictionary')
@@ -78,14 +98,15 @@ if translation_direction == 'German to English':
     # Input for German word
     german_word = st.text_input('Enter a German word:', '')
 
-    # Translate button for German to English
-    if st.button('Translate'):
-        if german_word:
-            try:
-                english_word = translator.translate(german_word, dest='en', src='de').text
-                st.write(english_word)
-            except Exception as e:
-                st.error(f"Error occurred during translation: {e}")
+    # Input for English translation using Google Translate API
+    english_word = ''
+    if german_word:
+        try:
+            english_word = translator.translate(german_word, dest='en', src='de').text
+        except Exception as e:
+            st.error(f"Error occurred during translation: {e}")
+
+    st.write(english_word)
 
     if st.button('Add to Dictionary'):
         if german_word and english_word:
@@ -94,7 +115,7 @@ if translation_direction == 'German to English':
             dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
             # Save the updated dictionary
-            save_dictionary(github_csv_url, dictionary_df)
+            save_dictionary_to_github(github_csv_url, dictionary_df)
 
             st.write(f'Added: {german_word} -> {english_word}')
         else:
@@ -104,14 +125,15 @@ else:  # English to German
     # Input for English word
     english_word = st.text_input('Enter an English word:', '')
 
-    # Translate button for English to German
-    if st.button('Translate'):
-        if english_word:
-            try:
-                german_word = translator.translate(english_word, dest='de', src='en').text
-                st.write(german_word)
-            except Exception as e:
-                st.error(f"Error occurred during translation: {e}")
+    # Input for German translation using Google Translate API
+    german_word = ''
+    if english_word:
+        try:
+            german_word = translator.translate(english_word, dest='de', src='en').text
+        except Exception as e:
+            st.error(f"Error occurred during translation: {e}")
+
+    st.write(german_word)
 
     if st.button('Add to Dictionary'):
         if english_word and german_word:
@@ -120,18 +142,16 @@ else:  # English to German
             dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
             # Save the updated dictionary
-            save_dictionary(github_csv_url, dictionary_df)
+            save_dictionary_to_github(github_csv_url, dictionary_df)
 
             st.write(f'Added: {english_word} -> {german_word}')
         else:
             st.write('Please enter both the English word and its German translation.')
-# Function to pronounce the word using pyttsx3
-def pronounce_word(word):
-    engine = pyttsx3.init()
-    engine.say(word)
-    engine.runAndWait()
 
 # Flashcard navigation
+if st.button('Flip'):
+    st.session_state.flipped = not st.session_state.flipped
+
 if st.button('Next'):
     st.session_state.current_index = (st.session_state.current_index + 1) % len(dictionary_df)
     st.session_state.flipped = False
@@ -140,14 +160,18 @@ if st.button('Previous'):
     st.session_state.current_index = (st.session_state.current_index - 1) % len(dictionary_df)
     st.session_state.flipped = False
 
-# Display the current flashcard
-#render_flashcard(st.session_state.current_index, st.session_state.flipped)
-
 # Display the current flashcard and pronounce the word
 current_word = render_flashcard(st.session_state.current_index, st.session_state.flipped)
+
+def pronounce_word(word, rate=150):
+    engine = pyttsx3.init()
+    engine.setProperty('rate', rate)  # Adjust the rate of speech
+    engine.say(word)
+    engine.runAndWait()
+
 if current_word:
     if st.button('Pronounce'):
-        pronounce_word(current_word)
+        pronounce_word(current_word,rate=120)
 
 # Display the stored dictionary in a table
 st.write('Translation Dictionary:')
