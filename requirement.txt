@@ -2,5 +2,5 @@ streamlit
 pandas
 googletrans==3.1.0a0
 os
-pyttsx3
+pyttsx3==2.90
 
