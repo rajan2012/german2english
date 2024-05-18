@@ -154,13 +154,14 @@ current_word = render_flashcard(st.session_state.current_index, st.session_state
 
 # Flashcard navigation buttons
 col1, col2, col3 = st.columns(3)
+with col2:
+    if st.button('Flip'):
+        st.session_state.flipped = not st.session_state.flipped
 with col1:
     if st.button('Previous'):
         st.session_state.current_index = (st.session_state.current_index - 1) % len(dictionary_df)
         st.session_state.flipped = False
-with col2:
-    if st.button('Flip'):
-        st.session_state.flipped = not st.session_state.flipped
+
 with col3:
     if st.button('Next'):
         st.session_state.current_index = (st.session_state.current_index + 1) % len(dictionary_df)
