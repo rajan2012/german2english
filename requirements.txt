@@ -3,3 +3,4 @@ pandas
 googletrans==3.1.0a0
 pyttsx3==2.7
 PyGithub==1.55
+
