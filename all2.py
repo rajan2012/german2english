@@ -1,4 +1,4 @@
-#for webiste
+#for webiste to accessed in mobile
 import pyttsx3
 import streamlit as st
 import pandas as pd
