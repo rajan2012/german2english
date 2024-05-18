@@ -1,11 +1,3 @@
-German,English
-fehler,mistake
-gebaude,building
-fenster,window
-Fernseher,tv
-Tisch,table
-Blume,flower
-essen,eat
 setzen,seat
 werde ,will
 wartet,waiting
@@ -185,7 +177,7 @@ sonst ,otherwise
 wahl,choice
 andere,another
 schlauste,smart
-blieben ,stayed
+blieben ,stayed ,remained
 geschlossen,locked
 wahrscheinlich,probably
 gedacht,thought
@@ -213,7 +205,7 @@ was ist los ,whats going on
 gefangnis,prison
 besuchen,visit
 entfuher,kidnnaper
-ach ja ,stimmt
+ach ja ,stimmt ,oh yea,right
 ich freue mich ,i'm happy
 draussen,outside
 auf dich ,for you
@@ -609,8 +601,8 @@ antworten , to answer
 sich bedanken , to thank oneself
 abfahren , to depart
 hören , to hear
-ansehen , to look at
-gut , good
+ansehen , to look at, to watch
+gut , good, well
 finden , to find
 Schulabschluss,graduation
 fehlen,absent
@@ -629,7 +621,7 @@ reiten,ride
 zelten,camping
 aufstehen,get up
 beantworten , to answer
-ergänzen , to complete
+ergänzen , to complete, to supplement
 entwerfen , to design
 verstärken , to strengthen
 überprüfen , to check/verify
@@ -638,6 +630,7 @@ eingeladen,invited
 gegeben,given
 laut ,loud
 dort,there
+Wie hat sie/ er ausgesehen
 vergiss ,vergesst
 Beschweren,complain
 zelten ,campping
@@ -653,7 +646,7 @@ kunstler ,artist
 anwaltin,lawyer
 malst,paint
 gemobbt,bullied
-argern ,bully
+argern ,bully,anger
 angst,scared
 schlagt,hit
 gespannt ,curious
@@ -811,7 +804,7 @@ angestelltne,employee
 fast,almost
 ausserdem,plus or additionally
 zeimlich,crowded
-voll,pretty
+voll,pretty,completely
 absturz,crash
 fallt,falling
 Himmel ,sky
@@ -848,7 +841,7 @@ ausstellung,exhibition
 fuhrung durch,guided tour
 vorschlag,suggestion
 ausflug,excursion leisure
-ausflug , side trip
+ausflug , side trip , leisure
 uberlegen,think
 zunachst,first
 aufgaben,task
@@ -871,7 +864,7 @@ ein paar ,a few
 komisch,strange
 daher,therefore
 ahnliche,similar
-uberhaupt,anything
+uberhaupt,anything , at all
 folgendes,following
 erlebt ,experienced
 wurste,sausage
