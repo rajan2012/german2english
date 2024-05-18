@@ -1,3 +1,4 @@
+#for adding more word into local file and then seding this file into git
 import streamlit as st
 import pandas as pd
 import os
@@ -151,10 +152,17 @@ if st.button('Previous'):
 
 # Display the current flashcard and pronounce the word
 current_word = render_flashcard(st.session_state.current_index, st.session_state.flipped)
+
+def pronounce_word(word, rate=150):
+    engine = pyttsx3.init()
+    engine.setProperty('rate', rate)  # Adjust the rate of speech
+    engine.say(word)
+    engine.runAndWait()
+
 if current_word:
     if st.button('Pronounce'):
-        pronounce_word(current_word)
+        pronounce_word(current_word,rate=120)
 
 # Display the stored dictionary in a table
-#st.write('Translation Dictionary:')
-#st.dataframe(dictionary_df)
+st.write('Translation Dictionary:')
+st.dataframe(dictionary_df)
