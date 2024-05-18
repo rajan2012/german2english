@@ -148,9 +148,7 @@ else:  # English to German
         else:
             st.write('Please enter both the English word and its German translation.')
 
-# Flashcard navigation
-if st.button('Flip'):
-    st.session_state.flipped = not st.session_state.flipped
+
 
 if st.button('Next'):
     st.session_state.current_index = (st.session_state.current_index + 1) % len(dictionary_df)
@@ -160,9 +158,15 @@ if st.button('Previous'):
     st.session_state.current_index = (st.session_state.current_index - 1) % len(dictionary_df)
     st.session_state.flipped = False
 
+
 # Display the current flashcard and pronounce the word
 current_word = render_flashcard(st.session_state.current_index, st.session_state.flipped)
 
+
+# Flashcard navigation
+if st.button('Flip'):
+    st.session_state.flipped = not st.session_state.flipped
+    
 #, rate=150
 def pronounce_word(word):
     engine = pyttsx3.init()
