@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from googletrans import Translator
 
+
 # Initialize translator
 translator = Translator()
 
