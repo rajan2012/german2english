@@ -3,7 +3,6 @@ import pandas as pd
 import os
 from googletrans import Translator
 
-
 # Initialize translator
 translator = Translator()
 
@@ -40,22 +39,33 @@ def render_flashcard(index, flipped):
         german_word = dictionary_df.iloc[index]['German']
         english_word = dictionary_df.iloc[index]['English']
 
-        if flipped:
-            st.markdown(
-                f"""
-                <div style="border: 2px solid #4CAF50; padding: 20px; border-radius: 10px; background-color: #f9f9f9;">
-                    <h3 style="color: #4CAF50;">{english_word}</h3>
-                </div>
-                """, unsafe_allow_html=True
-            )
-        else:
-            st.markdown(
-                f"""
-                <div style="border: 2px solid #4CAF50; padding: 20px; border-radius: 10px; background-color: #f9f9f9;">
-                    <h3 style="color: #4CAF50;">{german_word}</h3>
-                </div>
-                """, unsafe_allow_html=True
-            )
+        # Determine the word to be displayed based on flip state
+        display_word = english_word if flipped else german_word
+
+        # Define CSS styles for the flashcard
+        card_style = """
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            width: 300px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        """
+        word_style = """
+            color: #4CAF50;
+            font-size: 24px;
+        """
+
+        # Render the flashcard
+        st.markdown(
+            f"""
+            <div style="{card_style}" onclick="this.style.transform='rotateY(180deg)'">
+                <h3 style="{word_style}">{display_word}</h3>
+            </div>
+            """, unsafe_allow_html=True
+        )
 
 
 # Streamlit app
@@ -118,11 +128,7 @@ else:  # English to German
         else:
             st.write('Please enter both the English word and its German translation.')
 
-
 # Flashcard navigation
-if st.button('Flip'):
-    st.session_state.flipped = not st.session_state.flipped
-
 if st.button('Next'):
     st.session_state.current_index = (st.session_state.current_index + 1) % len(dictionary_df)
     st.session_state.flipped = False
@@ -135,5 +141,5 @@ if st.button('Previous'):
 render_flashcard(st.session_state.current_index, st.session_state.flipped)
 
 # Display the stored dictionary in a table
-st.write('Translation Dictionary:')
-st.dataframe(dictionary_df)
+#st.write('Translation Dictionary:')
+#st.dataframe(dictionary_df)
