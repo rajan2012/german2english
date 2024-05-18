@@ -1,5 +1,7 @@
+python==2.7
 streamlit
 pandas
 googletrans==3.1.0a0
 pyttsx3==2.90
 PyGithub==1.55
+
