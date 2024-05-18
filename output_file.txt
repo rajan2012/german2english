@@ -1,0 +1,871 @@
+setzen,seat
+werde ,will
+wartet,waiting
+rein ,through
+vorstellen ,introduce
+auch,also
+freut ,pleased
+nehmen,take
+uber ,always
+wirklich,really
+letze,last
+schwaen,strength
+starken,weakness
+ungeduldig,impatient
+alles,everything
+gesprach,interview
+lieter,leader
+pausenraum,lunchroom
+gliechfalls,same to you
+stunde,lesson
+uber,about
+paar,couple
+irgendwann,someday
+eile,hurry
+kurzlick,recently
+getrennt,separated
+von,from
+gepasst,fit
+schluss,anymore
+fertig,finish
+reisebus,coach
+lass uns,lets
+spass, fun
+schatz, dear
+warte,wait
+draussen,outside
+sorge,worried
+wird ,will
+auch,too
+vertrauen ,trust
+anderes,other/else
+tun, to do
+hoffentlich,hoopefully
+sonst,or/otherwise
+vorsichtig,carefully
+weit,ready
+zelt ,tent
+scherz,sorry
+keine sorgen ,sorry
+klassekamraden,classmates
+vorne , over there/in front of
+stehen ,stand
+da ,there
+klassenfahrt,class trip
+auf ,during
+weiderhole,repeat
+nochmal,once again
+verspreche,promise
+begleiten,accompany
+peinlich,embarassing
+wegfahren,drive away
+uns ,each other
+bis dann ,see you
+jetzt,now
+vollzahlig,complete
+etwa ,about
+einsteigen,get in
+platz,space/seat
+sucht ,search
+dauert ,takes
+vergessen, to forgot
+schenll ,fast/quicly
+hinterher,after/follow
+schaffe,manage
+einzuholen,catch up
+ich freue mich auf die klassenfahrt ,i'm looking forward to the class trip
+anhalten ,stop (bus)
+aber ,but
+weiterfahren,continue driving
+witzig,funny
+allsteigen ,get out
+zeltplatz,campsite
+gemeinsam,together
+zum,to the
+gleich,almost
+aufschlagen,open
+lagerfeuer,campfire
+zu,to
+idee,idea
+streich,prank
+benehmen,behave
+spielverderberin ,spoilsport
+sein,be
+leise,quiet
+lass,let
+schutten ,pour
+alleine,alone
+verruckt,crazy
+nass,wet
+wahr,true
+bestimmt,definitely
+eigentlich,actually
+erwischt,got/caught you
+ganzes,whole
+schuld,fault
+auch,too
+wahrheit,truth
+passiert,happened
+arger,trouble
+auf dich ,for you
+draussen ,outside
+noch,still
+beeil dich ,hurry up
+nachdem,goes away
+ganz,quite
+vokabeltest,vocabulary test
+anfegangen,start
+mehr ,more
+verschwinden,disappear
+bessrung,get well soon
+bestimmt,definitely
+unterricht,instruction
+schlimmer,worse
+angekundigt, as announced
+note,mark/grade
+zahlt,count
+zeugnisnote,school report
+halte,bear /hold
+nicht mehr ,anymore
+tiele,handing
+gelegehenheit,opportunity
+viel erfolg,good luck
+zuruckhelten,hold back
+pupsen,fart
+dringend,urgently
+ware,would be
+schaffe,manage
+versuchen,try
+eklig,nasty
+gemein,mean
+ruhe,alone
+blieb stehen,stay
+weiter ,continue
+jedem,each/everyone
+weider,back(come)
+anderen,others
+auslachen,laugh
+sonst,otherwise
+deutlich,clear
+nett,kind
+irgendetwas,anything
+look,suchen
+verwendet,used
+check,überprüfen
+angst,fear
+erwischt,caught
+mutig,brave
+geld,money
+liesten,afford
+taschengeld,pocketmoney
+bekommst ,get (money)
+verdiene,earn
+eigenes,own
+gefragt,asked
+unnotig,unnecessary
+soweiso,anyway
+sparen,save
+schwarzfahren,travel without paying
+ich weiss nicht ,i don't know
+zeig,show
+verpflichtet,committed/obliged
+strafe,fine
+heraus,out
+stimmt nicht ,wrong
+verruckt, crazy
+sonst ,otherwise
+wahl,choice
+andere,another
+schlauste,smart
+blieben ,stayed ,remained
+geschlossen,locked
+wahrscheinlich,probably
+gedacht,thought
+seltsames,strange
+wird,will
+offnen,open
+reden,talk
+erstmal,now
+vorschlag,suggestion
+gespannt,curious
+zahlen,pay
+leicht glauble ,gullible
+vertraue ,trust
+wirklich,really
+ausserdem,besides
+du ** dabei ,with you
+sonst,otherwise
+wieder,again
+vorher,before /previously
+uberlegen,thought
+gemein,mean
+gefangnis,prison
+dasselbe,same
+was ist los ,whats going on
+gefangnis,prison
+besuchen,visit
+entfuher,kidnnaper
+ach ja ,stimmt ,oh yea,right
+ich freue mich ,i'm happy
+draussen,outside
+auf dich ,for you
+zieh,change
+steh,get up
+beeil,hurry
+besuchstermin,appointment
+vermisst ,missed
+bestimmt ,surely
+umziehen,change
+der nahe ,near by
+worauf,what
+gewartet ,wait
+ubertreibst,exaggerating
+ganze zeit ,whole time /all along
+verruckt,crazy
+endlich ,finally
+eigentlich,actually
+lustige,fun
+reagieren,react
+wir sind da ,we are there
+durch,through
+bei dir,with you
+irgendetwas,anything
+seltsam,strange
+anderen ,different /another
+echt ,really
+darfst,may
+folg mir ,follow me
+entlang,way
+abgenommen,took away/removed
+daruber ,about that
+begleite,accompanying
+beim,at the
+wichtig,important
+kennst,know
+schreckliche,horrible
+nerviges,annoying
+leisten,afford/keep
+angst,angry
+albern,ridiculuos
+wissen,know
+ruhe,quiet
+verruckte,crazy/lunatic
+weinen,cry
+beschutzt,protect
+erinnerst,remember
+geklaut,stolen
+selbst,own
+schuld,fault
+fehlern,mistake
+steke,put
+holt,get
+raus,out
+wahr,true
+traum,dream
+erfahrst,know
+bessern,change
+verhalten,change
+sauer,angry
+einverstanden,agreed
+erwishen,catch
+spanned,exciting
+fertig,finished
+jemand,someone
+beeilen,hurry
+bevor,before
+unbedingt,desperately need
+rausfinden ,find it out
+arger,trouble
+sonst,otherwise
+verstecken,hide
+erschrocken,scared
+kirmes,funfair
+schlecht,bad
+genug,enough
+gespart,saved
+stolz,proud
+auch ,also
+eindruck,impression
+ausstegen,get out
+steigen ,get in
+geben geld ,spend money
+einkaufszentrum ,shopping mall
+reinsgehen ,get in
+laden,store
+zeigen,show
+bloss,just
+schrecklich,terrible
+fuhle ,feel
+stohlen,stole
+ernst,serious
+tragst,wear
+wahrheit ,truth
+schlechtes,bad
+gewissen,conscine
+alleine,alone
+du arme ,poor you
+bereit,ready
+andere,other
+wahl,choice
+einfach,simply/easy
+geklaut,stole
+furchtbar,terrible
+erzahl,tell
+reagiert,react
+wissen die ,do they know?
+trauriges,sad
+verloren,lost
+gespart,saved
+geschenk,gift
+strafen,punish
+geh,go
+zeugnisse,school report
+noten,marks
+traumst,dream
+aufstehen,stand up
+gespannt,curious
+hasse,hate
+umziehen,change
+nur,just/only
+wenn,if
+abgemacht,agreed
+bekommst,get
+erstmal,first
+vorne,in fron of
+nachdem,after
+durfen,maybe
+hole,pick /get
+klingen,bell
+schnell,fast/quickly
+heineingehen,go inside
+grund,reason
+verspatung,delay
+langsam,slowly
+bestimmt,surely
+sicher,sure?
+verteilen,distribute
+schlechteste,worst
+kummere,care /worry
+geandert,changed
+deshalb,for this reason
+allerdings,however
+leider,unfortunately
+idee,idea
+klauen,steal
+erswischt,caught
+aufpassen,careful
+zittere,shake
+ganzen,entire/whole
+korper,body
+auffalen,attention
+beruhigen,calm down
+merkt,notice
+verkauferin ,shop assistant
+verhalt,acts/behaviour
+verlassen,leave
+losgegangen,went off
+schnell,fast
+Sicherheit,security
+abhauen,run away
+weggerannt,run away
+oberteil,top
+rock,shirt
+verstecken,hide
+verfolgt,followed/tracked
+klo,restroom
+richtung,direction
+draussen,out
+rauskommen,come out
+vertrauen ,trust
+anders,differently /other
+such ,choose
+fassen,believe
+massloss,exorbitantly
+enttauscht,disappointed
+strafe,punishment
+stark,hard/strong
+bestraft,punished
+miteinander,together
+straffe,punishment
+mehrere,multiple
+mehr,more
+streng,strict
+echt,really
+ubertrieben,exaggerated
+enttauscht,disappointed
+bloss,just
+verzeihen,forgive
+antwortet,responding
+umgefallen ,fell down
+ohnmachtig,unconscious
+krankenwagen,ambulance
+ansprechbar,responsive
+atmet,breathe
+uberprufen,check
+schau mal,just look
+schwach,weak
+beruhigen,calm down
+schicken,sending
+hubschrauber,helicopter
+halte,hold/hang
+bereit,prepare
+folgen ,follow
+bereits,already
+bewusstlos,unconscious
+untersuchen,examine
+ausserdem,beside
+schwachen,weak
+krankenhaus,hospital
+heraus,out
+trage,stretcher
+legen,lay
+hubschrauber,hospital
+leider,unfortunately
+schneller,faster
+dach,roof
+wegen,because
+gehirn,brain
+wahhrend,during
+aber,but
+sterben,die
+versuchen,try
+bereits,already/been
+entfernen,remove
+untersuchen,examine
+reh,deer
+bremsen,break(vehicle)
+schaffe,manage
+verschwinde,get
+ausweichen,dodge
+angreifen,attack
+bewegen,move
+verschwinde,lost
+genug,enough
+dachte,thought
+verltzt,hurt
+starker,severly
+bestimmt,surely
+anhalten,stop
+geschlossen,closed
+ohnmachtig,uncouncious
+verletzt,injured
+unterwegs,on the way
+kritischen,critical
+zustand,condition
+flehe,beg
+verletzungen,injured
+spurt ,feel
+genug,enough
+dasselbe,same
+verlieren,to spare
+erriechen , reach
+vollig,fully
+gesund ,recover
+liese,quiet
+gerade,currently/at the moment
+will,want
+weit,far
+durch ,through
+hintere tur ,backdoor
+runtergefallen,fall down
+moment mal ,wait a min
+eigentlich,wearing
+aufgefallen ,noticed
+tragst,wear
+so an, like that
+ziehe ,wear
+verappeln,kidding
+hingehen,go there
+egal ,care
+abhauen,get away
+irgendwie,somehow
+klettere,climb
+vorsichtig,careful
+geschafft,did it
+uberzeugt,convinced
+rauszulassen ,to let you out
+wieder,back/again
+leute,people
+bestimmt,certainly
+sie holen,get her
+sorgen,worry
+uberlegen,think/consider
+bestrafen,punishment
+reingehen ,go in
+abwarten,wait
+verhalten,behaviour
+schlechtes,bad
+blamieren,embarass
+siehst,look
+folgen,consequences
+trotzdem,anyway
+nett,kind
+eigentlich,actually
+vorbereiten,prepare
+glauben,beleibe
+kaum,hard
+betrugt,cheating
+scherz,joke
+bevor,before
+umziehen,change (cloth)
+bereits,already
+gemutlicher,comfortable
+neugierig,curious
+streiten,fight
+vertraue,trust
+miesse,bad
+wissen,know
+begleite,accompany
+arger,trouble
+oben,upstairs
+zeigen,show
+beruhig,calm
+wonach,what
+schlimmes,bad
+erklaren,explain
+nachhilfe,private
+Gestellt,decorate
+auf ,on
+an ,on
+zu ,on
+Schemen,taste
+Vergleichen,compare
+Wenden,turn around
+das Kraut , die Kräuter
+verlobt,engaged
+schlecht,bad
+fschwer,difficult
+Bezahlen,pay
+Uberfliegen,overfly
+Bieten,offer
+Stock,floor
+liese,quiet
+etwa,around
+beim, at the
+arztpraxis,doctor office
+Sprechstundenhilfe,receptionist
+Versichertenkarte,health insurance
+Behandlungsraum,treatmentroom
+röntgen,x-ray
+Versicherten,insured
+Vorsicht,caution
+alleine ,alone
+laufen,walk/run
+mal,just
+zahlt,pays
+Behandlungen ,treatment
+bezahlen,pay
+gegen,against
+Auf Wiederhören,sepak soon
+Unfall,accident
+trotzdem,despite
+voll,full
+mehr,more
+besteht,consist
+insgesamt,total
+folgen,consequences
+anziehen,put on
+Sprechstunde,offcie hours
+vorbeikommen,come round
+durfen ,permission
+gebrochen ,broken
+verschrieben,prescribed
+bewegen ,move
+benutzen ,use
+besorge ,get
+ausruhen ,relax
+aussagen ,solve
+Krücken,crutches
+salbe ,ointment
+taglich,daily
+benutzen,use
+aufstehen ,stand up
+untersuhen,examine
+krankschreibung,sick note
+denkt,thinks
+arbeitgeber,employer
+bedeutet , to mean
+verschrieben,prescribed
+offnen ,open
+halsenzuntung,sore throat
+ruhe ,quiet
+erkaltung,cold
+Wähl,choose
+fehlenden,missing
+Süßigkeiten,sweets
+Blutdruck.,blood pressure
+starken,strength
+wiederholen,made
+wurdest,become
+antworten , to answer
+sich bedanken , to thank oneself
+abfahren , to depart
+hören , to hear
+ansehen , to look at, to watch
+gut , good, well
+finden , to find
+Schulabschluss,graduation
+fehlen,absent
+Kreuzfahrt,cruise
+gegangen,went
+besonders,particularly
+dort,there
+Was fehlt ,what is missing
+hören , to hear
+to write a book , ein Buch schreiben
+gesund,healthy
+beschweren,complain
+bauch ,belly
+baden,swimming
+reiten,ride
+zelten,camping
+aufstehen,get up
+beantworten , to answer
+ergänzen , to complete, to supplement
+entwerfen , to design
+verstärken , to strengthen
+überprüfen , to check/verify
+fallen , to fall
+eingeladen,invited
+gegeben,given
+laut ,loud
+dort,there
+Wie hat sie/ er ausgesehen
+vergiss ,vergesst
+Beschweren,complain
+zelten ,campping
+verstanden,understood
+erkannt ,recognisex
+nur,only
+kekse,cookies
+freut,excuse
+rechnung,ticket
+kellner,waiter
+schiller,officer
+kunstler ,artist
+anwaltin,lawyer
+malst,paint
+gemobbt,bullied
+argern ,bully,anger
+angst,scared
+schlagt,hit
+gespannt ,curious
+eigentlich,anyway
+getan,do
+Fruhler,mistake
+leckers ,tasty
+Stuhl , Chair
+Stuhl , Chair
+Himmel,sky
+Vogel , Bird
+Mittagessen , Lunch
+Sonnenschein , Sunshine
+Garten , Garden
+Strand , Beach
+Lehrer , Teacher
+Stift , Pen
+Kunst , Art
+Möbel , Furniture
+Müll , Garbage
+Besprechung , Meeting
+Bewerbung , Application
+Abreise , Departure
+Abflug , Takeoff
+Klettern , Climbing
+Tauchen , Diving
+Segeln , Sailing
+folgen,follow
+Speisekarte auf Englisch ,menu
+Restaurant , Restaurant
+Tagesgericht , Daily Special
+Koch , Chef
+Schlug, beat
+Gegenreischen ,opposite team
+Flasche , bottle
+Vorlesung , lecture
+Vielzahl,variety
+Vorbereitung , preparation
+überprüfte ,checked
+unterrichtet ,teaches
+Klavier ,piano
+sammle ,collect
+statt,instead of
+trotz,despite of
+ab , from
+entgegen,towards
+Klappt,work
+mindestens, at least
+erinnere,remeber
+bereits, already
+Dorthin,there
+Eingebunden,enough
+Angezogen,overdressed
+Beruhige,relax
+Absagen,cancel
+Ruberkommen,come over
+Auf,for
+Verargert,upset
+Lugt,lie
+Schlechter,worse
+Stiefmutter,stepmom
+Waffe,gun
+Schwore,swear
+Mist, shit
+Uberreagiert,overreacted
+Gewohnt,used to it
+Vorchistig,careful
+Moment Mal , wait a min
+Hirn,brain
+Geduld,patience
+Beweg ,movd
+Albtraum,nightmare
+Wahrend ,date
+Verproschen,promise
+Vermiss ,miss
+Raten,guess
+Davon,about
+Zukunft,future world
+Geandert,ruined
+Besprechen,diecuss
+Uberhaupt ,going out
+Unnotig,not necessary
+Wie fruher , any more
+Lackhaft,joke
+Leicht,wasy
+Geworden,become
+Fehler,mistake
+Zuvor,earlier
+Klagen,complain
+Kunde,client
+Auf,of
+Hnagen,fool
+Schulen,owe
+zinse,interest
+bekamen,take
+schletcher ,bad
+enhalten,include
+anwalt,counsellor
+opfer,victim
+bewirken ,difference
+Umfrage,survey
+Ubrig,left
+deshalb,since
+deswegen,thats why
+daher,therefore
+ziehen,move
+grund,reason
+bewerbung,application
+darum,so
+kusteil,course
+nehmerin ,participants
+wegen ihres manne,because of her man
+aussprache,pronounciation
+trammel,kurse
+verofenttlich,publish
+unbekannte,unknown
+besucher,visitor
+erwartet,expected
+unterricht,class
+fallt,canceled
+zahlreichen,numerous
+stau,traffic jam
+fehlers ,mistake
+herz,cardiac
+kontrolliert,checked
+starken,strong
+Umstande,situation
+Remember,erinnern
+Schwach,weak
+Strong ,stark
+Vollig,completely
+abfliegt,depart
+ankommt,arrive
+augenblicklich,instantaneous
+beamter,official
+besorgen,get
+bose,evil
+datei,file
+durcheinander,messed up
+erschrocken,frightened
+missverstandnis,miss understanding
+normaleiweise,usuallly
+undeutlich,unclear
+zunachst,first
+neulich,recently
+als,as
+folgendes,following
+punktlich,on time
+anzeigentafel ,scoreboard
+durchsagen,announcement
+fluglinie,airline
+schalter,counter
+gegangen,went
+angestelltne,employee
+fast,almost
+ausserdem,plus or additionally
+zeimlich,crowded
+voll,pretty,completely
+absturz,crash
+fallt,falling
+Himmel ,sky
+laut,loudly
+plotzlich,suddenly
+still,quite
+gemerkt,realised
+sondern,rather
+aufgeklart,clarified
+geschichte,story
+daruber,many times
+froh,happy
+herasfinden, findout
+bemerkt,noticed
+pass auf ,watch out
+wohnort,place of residence
+gefreut,happy
+sauer,angry
+daruber,about
+niemand ,nobody
+da, there
+tier,animal
+ratsel,puzzle
+verlseung,lecture
+losung,soultion
+losen,solve
+nennt,called
+dunkle ,dark
+schlecht,badly
+dhaer,thats why
+standesamt,registry office
+veranstaltungen,event
+ausstellung,exhibition
+fuhrung durch,guided tour
+vorschlag,suggestion
+ausflug,excursion leisure
+ausflug , side trip , leisure
+uberlegen,think
+zunachst,first
+aufgaben,task
+erfahren ,experience
+malerei,painting
+witze,jokes
+dauer,permanent
+rundgang,tour
+teilnehmer,participants
+nagel,nail
+durcheinander,messed up
+bedeutung,meaning
+schlange,snake
+gesprach,talking
+erfunden ,inveneted
+gezogen,moved
+darum,thats why
+wegen ,because
+ein paar ,a few
+komisch,strange
+daher,therefore
+ahnliche,similar
+uberhaupt,anything , at all
+folgendes,following
+erlebt ,experienced
+wurste,sausage
+ganzen,whole
