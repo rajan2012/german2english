@@ -1,4 +1,3 @@
-#for adding more word into local file and then seding this file into git
 import streamlit as st
 import pandas as pd
 import os
@@ -13,7 +12,6 @@ translator = Translator()
 # Filepath for the dictionary
 filepath = r"C:\Users\User\Documents\msc\germansitegit\german2english\german_english_dictionary.csv"
 
-
 # Function to load dictionary from file
 def load_dictionary(file_path):
     if os.path.exists(file_path):
@@ -21,11 +19,9 @@ def load_dictionary(file_path):
     else:
         return pd.DataFrame(columns=['German', 'English'])
 
-
 # Function to save dictionary to file
 def save_dictionary(file_path, df):
     df.to_csv(file_path, index=False)
-
 
 # Load existing dictionary
 dictionary_df = load_dictionary(filepath)
@@ -35,7 +31,6 @@ if 'current_index' not in st.session_state:
     st.session_state.current_index = 0
 if 'flipped' not in st.session_state:
     st.session_state.flipped = False
-
 
 # Function to render the flashcard
 def render_flashcard(index, flipped):
@@ -56,6 +51,7 @@ def render_flashcard(index, flipped):
             display: flex;
             justify-content: center;
             align-items: center;
+            cursor: pointer;
         """
         word_style = """
             color: #4CAF50;
@@ -65,20 +61,19 @@ def render_flashcard(index, flipped):
         # Render the flashcard
         st.markdown(
             f"""
-            <div style="{card_style}" onclick="this.style.transform='rotateY(180deg)'">
+            <div style="{card_style}" onclick="flipFlashcard()">
                 <h3 style="{word_style}">{display_word}</h3>
             </div>
             """, unsafe_allow_html=True
         )
         return display_word
 
-
 # Function to pronounce the word
-def pronounce_word(word):
+def pronounce_word(word, rate=150):
     engine = pyttsx3.init()
+    engine.setProperty('rate', rate)  # Adjust the rate of speech
     engine.say(word)
     engine.runAndWait()
-
 
 # Streamlit app
 st.title('Translation Dictionary')
@@ -140,6 +135,11 @@ else:  # English to German
         else:
             st.write('Please enter both the English word and its German translation.')
 
+
+
+# Display the current flashcard and pronounce the word
+current_word = render_flashcard(st.session_state.current_index, st.session_state.flipped)
+
 # Flashcard navigation
 if st.button('Flip'):
     st.session_state.flipped = not st.session_state.flipped
@@ -152,22 +152,45 @@ if st.button('Previous'):
     st.session_state.current_index = (st.session_state.current_index - 1) % len(dictionary_df)
     st.session_state.flipped = False
 
-# Display the current flashcard and pronounce the word
-current_word = render_flashcard(st.session_state.current_index, st.session_state.flipped)
-
-def pronounce_word(word, rate=150):
-    engine = pyttsx3.init()
-    engine.setProperty('rate', rate)  # Adjust the rate of speech
-    engine.say(word)
-    engine.runAndWait()
-
 if current_word:
     if st.button('Pronounce'):
-        pronounce_word(current_word,rate=120)
+        pronounce_word(current_word, rate=120)
 
 # Define grid options
 gb = GridOptionsBuilder.from_dataframe(dictionary_df)
-gb.configure_default_column(width=1000)  # Adjust width as needed
+gb.configure_default_column(width=200)  # Adjust width as needed
 gridOptions = gb.build()
 
 AgGrid(dictionary_df, gridOptions=gridOptions, height=400, theme='streamlit')
+
+# JavaScript for flip functionality
+st.markdown(
+    """
+    <script>
+    function flipFlashcard() {
+        window.parent.postMessage({
+            isStreamlitMessage: true,
+            type: "flip_flashcard"
+        }, "*");
+    }
+    </script>
+    """, unsafe_allow_html=True
+)
+
+# Add a hidden HTML element to listen for flip events
+st.markdown(
+    """
+    <div id="flashcard-flip-listener"></div>
+    <script>
+    document.getElementById("flashcard-flip-listener").addEventListener("flip_flashcard", function() {
+        window.location.href = window.location.href + '?flip_flashcard=true';
+    });
+    </script>
+    """, unsafe_allow_html=True
+)
+
+# Check if the flip_flashcard event was triggered
+if st.experimental_get_query_params().get('flip_flashcard'):
+    st.session_state.flipped = not st.session_state.flipped
+    # Remove the query parameter
+    st.experimental_set_query_params()
