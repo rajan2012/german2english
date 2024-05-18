@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 from googletrans import Translator
+import pyttsx3
 
 # Initialize translator
 translator = Translator()
@@ -66,6 +67,14 @@ def render_flashcard(index, flipped):
             </div>
             """, unsafe_allow_html=True
         )
+        return display_word
+
+
+# Function to pronounce the word
+def pronounce_word(word):
+    engine = pyttsx3.init()
+    engine.say(word)
+    engine.runAndWait()
 
 
 # Streamlit app
@@ -129,6 +138,9 @@ else:  # English to German
             st.write('Please enter both the English word and its German translation.')
 
 # Flashcard navigation
+if st.button('Flip'):
+    st.session_state.flipped = not st.session_state.flipped
+
 if st.button('Next'):
     st.session_state.current_index = (st.session_state.current_index + 1) % len(dictionary_df)
     st.session_state.flipped = False
@@ -137,8 +149,11 @@ if st.button('Previous'):
     st.session_state.current_index = (st.session_state.current_index - 1) % len(dictionary_df)
     st.session_state.flipped = False
 
-# Display the current flashcard
-render_flashcard(st.session_state.current_index, st.session_state.flipped)
+# Display the current flashcard and pronounce the word
+current_word = render_flashcard(st.session_state.current_index, st.session_state.flipped)
+if current_word:
+    if st.button('Pronounce'):
+        pronounce_word(current_word)
 
 # Display the stored dictionary in a table
 #st.write('Translation Dictionary:')
