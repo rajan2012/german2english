@@ -7,6 +7,7 @@ from googletrans import Translator
 import requests
 from io import StringIO
 from github import Github
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 # Initialize translator
 translator = Translator()
@@ -180,6 +181,9 @@ if current_word:
         #,rate=120
         pronounce_word(current_word)
 
-# Display the stored dictionary in a table
-st.write('Translation Dictionary:')
-st.dataframe(dictionary_df)
+# Define grid options
+gb = GridOptionsBuilder.from_dataframe(dictionary_df)
+gb.configure_default_column(width=1000)  # Adjust width as needed
+gridOptions = gb.build()
+
+AgGrid(dictionary_df, gridOptions=gridOptions, height=400, theme='streamlit')
