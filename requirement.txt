@@ -1,8 +1,6 @@
 streamlit
 pandas
 googletrans==3.1.0a0
-<<<<<<< HEAD
 os
-=======
-os
->>>>>>> d0477382a44fedf197ace7f6ed546db8ae2d1d04
+pyttsx3==2.90
+
