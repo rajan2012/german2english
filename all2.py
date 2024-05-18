@@ -163,15 +163,17 @@ if st.button('Previous'):
 # Display the current flashcard and pronounce the word
 current_word = render_flashcard(st.session_state.current_index, st.session_state.flipped)
 
-def pronounce_word(word, rate=150):
+#, rate=150
+def pronounce_word(word):
     engine = pyttsx3.init()
-    engine.setProperty('rate', rate)  # Adjust the rate of speech
+    #engine.setProperty('rate', rate)  # Adjust the rate of speech
     engine.say(word)
     engine.runAndWait()
 
 if current_word:
     if st.button('Pronounce'):
-        pronounce_word(current_word,rate=120)
+        #,rate=120
+        pronounce_word(current_word)
 
 # Display the stored dictionary in a table
 st.write('Translation Dictionary:')
