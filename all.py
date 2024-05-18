@@ -135,5 +135,5 @@ if st.button('Previous'):
 render_flashcard(st.session_state.current_index, st.session_state.flipped)
 
 # Display the stored dictionary in a table
-st.write('Translation Dictionary:')
-st.dataframe(dictionary_df)
+#st.write('Translation Dictionary:')
+#st.dataframe(dictionary_df)
