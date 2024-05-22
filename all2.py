@@ -7,6 +7,7 @@ from googletrans import Translator
 import requests
 from io import StringIO
 from github import Github
+from gtts import gTTS
 from st_aggrid import AgGrid, GridOptionsBuilder
 
 # Initialize translator
@@ -83,14 +84,44 @@ def render_flashcard(index, flipped):
 
 
 # Function to pronounce the word
-def pronounce_word(word):
+def pronounce_word(word, rate=150):
     engine = pyttsx3.init()
+    engine.setProperty('rate', rate)  # Adjust the rate of speech
     engine.say(word)
     engine.runAndWait()
 
-
 # Streamlit app
 st.title('Translation Dictionary')
+# Combine search and pronunciation in one box
+st.header('Search or Pronounce a German Word')
+combined_input = st.text_input('Enter a German word to search or pronounce:', '')
+
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button('Search'):
+        if combined_input:
+            search_result = dictionary_df[dictionary_df['German'].str.contains(combined_input, case=False, na=False)]
+            if not search_result.empty:
+                st.write('Search Results:')
+                st.write(search_result)
+            else:
+                st.write('No results found.')
+        else:
+            st.write('Please enter a German word to search.')
+
+with col2:
+    if st.button('Pronounce'):
+        if combined_input:
+            tts = gTTS(text=combined_input, lang='de')
+            tts.save("pronounce_temp.mp3")
+            audio_file = open("pronounce_temp.mp3", "rb")
+            audio_bytes = audio_file.read()
+            #st.audio(audio_bytes, format='audio/mp3')
+            st.audio(audio_bytes, format='audio/mp3', start_time=0)
+        else:
+            st.write('Please enter a German word to pronounce.')
+
 
 # Choose translation direction
 translation_direction = st.radio('Select translation direction:', ('German to English', 'English to German'))
@@ -111,14 +142,17 @@ if translation_direction == 'German to English':
 
     if st.button('Add to Dictionary'):
         if german_word and english_word:
-            # Add the translation to the DataFrame
-            new_entry = pd.DataFrame({'German': [german_word], 'English': [english_word]})
-            dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
+            if not any(dictionary_df['German'] == german_word):
+                # Add the translation to the DataFrame
+                new_entry = pd.DataFrame({'German': [german_word], 'English': [english_word]})
+                dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
-            # Save the updated dictionary
-            save_dictionary_to_github(github_csv_url, dictionary_df)
+                # Save the updated dictionary
+                save_dictionary_to_github(github_csv_url, dictionary_df)
 
-            st.write(f'Added: {german_word} -> {english_word}')
+                st.write(f'Added: {german_word} -> {english_word}')
+            else:
+                st.write(f'The German word "{german_word}" already exists in the dictionary.')
         else:
             st.write('Please enter both the German word and its English translation.')
 
@@ -131,21 +165,29 @@ else:  # English to German
     if english_word:
         try:
             german_word = translator.translate(english_word, dest='de', src='en').text
+            st.write(german_word)
+            if st.button('Pronounce Translated Word'):
+                tts = gTTS(text=german_word, lang='de')
+                tts.save("translated_word_temp.mp3")
+                audio_file = open("translated_word_temp.mp3", "rb")
+                audio_bytes = audio_file.read()
+                st.audio(audio_bytes, format='audio/mp3', start_time=0)
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
 
-    st.write(german_word)
-
     if st.button('Add to Dictionary'):
         if english_word and german_word:
-            # Add the translation to the DataFrame
-            new_entry = pd.DataFrame({'German': [german_word], 'English': [english_word]})
-            dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
+            if not any(dictionary_df['English'] == english_word):
+                # Add the translation to the DataFrame
+                new_entry = pd.DataFrame({'German': [german_word], 'English': [english_word]})
+                dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
-            # Save the updated dictionary
-            save_dictionary_to_github(github_csv_url, dictionary_df)
+                # Save the updated dictionary
+                save_dictionary_to_github(github_csv_url, dictionary_df)
 
-            st.write(f'Added: {english_word} -> {german_word}')
+                st.write(f'Added: {english_word} -> {german_word}')
+            else:
+                st.write(f'The English word "{english_word}" already exists in the dictionary.')
         else:
             st.write('Please enter both the English word and its German translation.')
 
@@ -153,33 +195,24 @@ else:  # English to German
 # Display the current flashcard and pronounce the word
 current_word = render_flashcard(st.session_state.current_index, st.session_state.flipped)
 
-# Flashcard navigation buttons
-col1, col2, col3 = st.columns(3)
-with col1:
-    if st.button('Flip'):
-        st.session_state.flipped = not st.session_state.flipped
-with col3:
-    if st.button('Previous'):
-        st.session_state.current_index = (st.session_state.current_index - 1) % len(dictionary_df)
-        st.session_state.flipped = False
 
-with col2:
-    if st.button('Next'):
-        st.session_state.current_index = (st.session_state.current_index + 1) % len(dictionary_df)
-        st.session_state.flipped = False
 
-    
-#, rate=150
-def pronounce_word(word):
-    engine = pyttsx3.init()
-    #engine.setProperty('rate', rate)  # Adjust the rate of speech
-    engine.say(word)
-    engine.runAndWait()
+# Flashcard navigation
+if st.button('Flip'):
+    st.session_state.flipped = not st.session_state.flipped
+
+if st.button('Next'):
+    st.session_state.current_index = (st.session_state.current_index + 1) % len(dictionary_df)
+    st.session_state.flipped = False
+
+if st.button('Previous'):
+    st.session_state.current_index = (st.session_state.current_index - 1) % len(dictionary_df)
+    st.session_state.flipped = False
+
 
 if current_word:
-    if st.button('Pronounce'):
-        #,rate=120
-        pronounce_word(current_word)
+    if st.button('Pronounce2'):
+        pronounce_word(current_word,rate=120)
 
 # Define grid options
 gb = GridOptionsBuilder.from_dataframe(dictionary_df)
