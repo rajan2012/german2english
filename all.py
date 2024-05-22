@@ -130,6 +130,13 @@ if translation_direction == 'German to English':
     if german_word:
         try:
             english_word = translator.translate(german_word, dest='en', src='de').text
+            st.write(english_word)
+            if st.button('Pronounce German Word22'):
+                tts = gTTS(text=german_word, lang='de')
+                tts.save("translated_word_temp3.mp3")
+                audio_file = open("translated_word_temp3.mp3", "rb")
+                audio_bytes = audio_file.read()
+                st.audio(audio_bytes, format='audio/mp3', start_time=0)
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
 
