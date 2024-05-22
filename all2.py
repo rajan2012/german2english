@@ -165,10 +165,15 @@ else:  # English to German
     if english_word:
         try:
             german_word = translator.translate(english_word, dest='de', src='en').text
+            st.write(german_word)
+            if st.button('Pronounce Translated Word'):
+                tts = gTTS(text=german_word, lang='de')
+                tts.save("translated_word_temp.mp3")
+                audio_file = open("translated_word_temp.mp3", "rb")
+                audio_bytes = audio_file.read()
+                st.audio(audio_bytes, format='audio/mp3', start_time=0)
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
-
-    st.write(german_word)
 
     if st.button('Add to Dictionary'):
         if english_word and german_word:
