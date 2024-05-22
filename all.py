@@ -137,7 +137,8 @@ if translation_direction == 'German to English':
 
     if st.button('Add to Dictionary'):
         if german_word and english_word:
-            if not any(dictionary_df['German'] == german_word):
+            existing_entry = dictionary_df[dictionary_df['German'] == german_word]
+            if existing_entry.empty:
                 # Add the translation to the DataFrame
                 new_entry = pd.DataFrame({'German': [german_word], 'English': [english_word]})
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
@@ -147,7 +148,8 @@ if translation_direction == 'German to English':
 
                 st.write(f'Added: {german_word} -> {english_word}')
             else:
-                st.write(f'The German word "{german_word}" already exists in the dictionary.')
+                existing_english_word = existing_entry['English'].values[0]
+                st.write(f'The German word "{german_word}" already exists in the dictionary with the English translation: "{existing_english_word}".')
         else:
             st.write('Please enter both the German word and its English translation.')
 
