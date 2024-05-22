@@ -88,17 +88,35 @@ def pronounce_word(word, rate=150):
 
 # Streamlit app
 st.title('Translation Dictionary')
+# Combine search and pronunciation in one box
+st.header('Search or Pronounce a German Word')
+combined_input = st.text_input('Enter a German word to search or pronounce:', '')
 
-# Add a search box for German words
-search_german = st.text_input('Search for a German word in the dictionary:', '')
+col1, col2 = st.columns(2)
 
-if search_german:
-    search_result = dictionary_df[dictionary_df['German'].str.contains(search_german, case=False, na=False)]
-    if not search_result.empty:
-        st.write('Search Results:')
-        st.write(search_result)
-    else:
-        st.write('No results found.')
+with col1:
+    if st.button('Search'):
+        if combined_input:
+            search_result = dictionary_df[dictionary_df['German'].str.contains(combined_input, case=False, na=False)]
+            if not search_result.empty:
+                st.write('Search Results:')
+                st.write(search_result)
+            else:
+                st.write('No results found.')
+        else:
+            st.write('Please enter a German word to search.')
+
+with col2:
+    if st.button('Pronounce'):
+        if combined_input:
+            tts = gTTS(text=combined_input, lang='de')
+            tts.save("pronounce_temp.mp3")
+            audio_file = open("pronounce_temp.mp3", "rb")
+            audio_bytes = audio_file.read()
+            st.audio(audio_bytes, format='audio/mp3')
+        else:
+            st.write('Please enter a German word to pronounce.')
+
 
 # Choose translation direction
 translation_direction = st.radio('Select translation direction:', ('German to English', 'English to German'))
