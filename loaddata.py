@@ -1,16 +1,7 @@
 import os
 import boto3
 import pandas as pd
-import streamlit as st
-import joblib
-import pickle
-from io import BytesIO
-import io
-from tempfile import NamedTemporaryFile
-
-import requests
 from io import StringIO
-
 import streamlit as st
 
 
