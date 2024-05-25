@@ -8,14 +8,14 @@ from io import StringIO
 from st_aggrid import AgGrid, GridOptionsBuilder
 from gtts import gTTS
 import base64
+from io import BytesIO
+
+from loaddata import load_data_s3, save_data_s3
 
 # Initialize translator
 translator = Translator()
 
-# Filepath for the dictionary
-filepath = r"C:\Users\User\Documents\msc\germansitegit\german2english\german_english_dictionary.csv"
-
-def text_to_speech_url(text):
+def text_to_speech_url2(text):
     tts = gTTS(text=text, lang='de')
     tts.save("temp.mp3")
     with open("temp.mp3", "rb") as audio_file:
@@ -23,21 +23,39 @@ def text_to_speech_url(text):
         audio_base64 = base64.b64encode(audio_bytes).decode()
     return f"data:audio/mp3;base64,{audio_base64}"
 
-# Function to load dictionary from file
-def load_dictionary(file_path):
-    if os.path.exists(file_path):
-        return pd.read_csv(file_path)
-    else:
-        return pd.DataFrame(columns=['German', 'English'])
 
-# Function to save dictionary to file
-def save_dictionary(file_path, df):
-    df.to_csv(file_path, index=False)
+def text_to_speech_url(text):
+    # Create the Text-to-Speech object
+    tts = gTTS(text=text, lang='de')
 
-# Load existing dictionary
-#dictionary_df = load_dictionary(filepath)
+    # Create an in-memory file-like object
+    audio_bytes_io = BytesIO()
 
+    # Save the audio data to the in-memory file-like object
+    tts.write_to_fp(audio_bytes_io)
 
+    # Get the audio data from the in-memory file-like object
+    audio_bytes_io.seek(0)
+    audio_bytes = audio_bytes_io.read()
+
+    # Encode the audio data in Base64
+    audio_base64 = base64.b64encode(audio_bytes).decode()
+
+    # Construct the data URL
+    data_url = f"data:audio/mp3;base64,{audio_base64}"
+
+    return data_url
+
+# Function to pronounce the word
+def pronounce_word(word, rate=150):
+    engine = pyttsx3.init()
+    engine.setProperty('rate', rate)  # Adjust the rate of speech
+    engine.say(word)
+    engine.runAndWait()
+
+bucket='test22-rajan'
+filename='german_english_dictionary.csv'
+dictionary_df = load_data_s3(bucket,filename)
 
 # Initialize session state for the current index and flip state
 if 'current_index' not in st.session_state:
@@ -115,7 +133,7 @@ with col2:
             tts.save("pronounce_temp.mp3")
             audio_file = open("pronounce_temp.mp3", "rb")
             audio_bytes = audio_file.read()
-            st.audio(audio_bytes, format='audio/mp3')
+            st.audio(audio_bytes, format='audio/mp3', start_time=0, autoplay=True)
         else:
             st.write('Please enter a German word to pronounce.')
 
@@ -138,7 +156,7 @@ if translation_direction == 'German to English':
                 tts.save("translated_word_temp3.mp3")
                 audio_file = open("translated_word_temp3.mp3", "rb")
                 audio_bytes = audio_file.read()
-                st.audio(audio_bytes, format='audio/mp3', start_time=0)
+                st.audio(audio_bytes, format='audio/mp3', start_time=0, autoplay=True)
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
 
@@ -153,7 +171,7 @@ if translation_direction == 'German to English':
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
                 # Save the updated dictionary
-                save_dictionary(filepath, dictionary_df)
+                save_data_s3(dictionary_df, bucket,filename)
 
                 st.write(f'Added: {german_word} -> {english_word}')
             else:
@@ -177,7 +195,7 @@ else:  # English to German
                 tts.save("translated_word_temp.mp3")
                 audio_file = open("translated_word_temp.mp3", "rb")
                 audio_bytes = audio_file.read()
-                st.audio(audio_bytes, format='audio/mp3', start_time=0)
+                st.audio(audio_bytes, format='audio/mp3', start_time=0, autoplay=True)
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
 
@@ -189,7 +207,7 @@ else:  # English to German
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
                 # Save the updated dictionary
-                save_dictionary(filepath, dictionary_df)
+                save_data_s3(dictionary_df, bucket,filename)
 
                 st.write(f'Added: {english_word} -> {german_word}')
             else:

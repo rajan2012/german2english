@@ -1,49 +1,51 @@
-#this is for local
+#for webiste to accessed in mobile
+import pyttsx3
 import streamlit as st
 import pandas as pd
 import os
 from googletrans import Translator
-import pyttsx3
+import requests
 from io import StringIO
-from st_aggrid import AgGrid, GridOptionsBuilder
+from github import Github
 from gtts import gTTS
-import base64
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 # Initialize translator
 translator = Translator()
 
-# Filepath for the dictionary
-filepath = r"C:\Users\User\Documents\msc\germansitegit\german2english\german_english_dictionary.csv"
-
-def text_to_speech_url(text):
-    tts = gTTS(text=text, lang='de')
-    tts.save("temp.mp3")
-    with open("temp.mp3", "rb") as audio_file:
-        audio_bytes = audio_file.read()
-        audio_base64 = base64.b64encode(audio_bytes).decode()
-    return f"data:audio/mp3;base64,{audio_base64}"
-
 # Function to load dictionary from file
-def load_dictionary(file_path):
-    if os.path.exists(file_path):
-        return pd.read_csv(file_path)
+def load_dictionary(file_url):
+    response = requests.get(file_url)
+    if response.status_code == 200:
+        csv_content = response.text
+        return pd.read_csv(StringIO(csv_content))
     else:
         return pd.DataFrame(columns=['German', 'English'])
 
+
+# GitHub raw URL for the dictionary CSV file
+github_csv_url = "https://raw.githubusercontent.com/rajan2012/german2english/main/german_english_dictionary.csv"
+
+
 # Function to save dictionary to file
-def save_dictionary(file_path, df):
-    df.to_csv(file_path, index=False)
+# Function to save dictionary to file in GitHub repository
+def save_dictionary_to_github(file_url, df):
+    csv_content = df.to_csv(index=False)
+    response = requests.put(file_url, data=csv_content)
+    if response.status_code == 200:
+        st.success("Dictionary updated successfully on GitHub.")
+    else:
+        st.error("Failed to update dictionary on GitHub.")
 
 # Load existing dictionary
-#dictionary_df = load_dictionary(filepath)
-
-
+dictionary_df = load_dictionary(github_csv_url)
 
 # Initialize session state for the current index and flip state
 if 'current_index' not in st.session_state:
     st.session_state.current_index = 0
 if 'flipped' not in st.session_state:
     st.session_state.flipped = False
+
 
 # Function to render the flashcard
 def render_flashcard(index, flipped):
@@ -64,7 +66,6 @@ def render_flashcard(index, flipped):
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
         """
         word_style = """
             color: #4CAF50;
@@ -74,12 +75,13 @@ def render_flashcard(index, flipped):
         # Render the flashcard
         st.markdown(
             f"""
-            <div style="{card_style}" onclick="flipFlashcard()">
+            <div style="{card_style}" onclick="this.style.transform='rotateY(180deg)'">
                 <h3 style="{word_style}">{display_word}</h3>
             </div>
             """, unsafe_allow_html=True
         )
         return display_word
+
 
 # Function to pronounce the word
 def pronounce_word(word, rate=150):
@@ -115,7 +117,8 @@ with col2:
             tts.save("pronounce_temp.mp3")
             audio_file = open("pronounce_temp.mp3", "rb")
             audio_bytes = audio_file.read()
-            st.audio(audio_bytes, format='audio/mp3')
+            #st.audio(audio_bytes, format='audio/mp3')
+            st.audio(audio_bytes, format='audio/mp3', start_time=0)
         else:
             st.write('Please enter a German word to pronounce.')
 
@@ -142,8 +145,6 @@ if translation_direction == 'German to English':
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
 
-    st.write(english_word)
-
     if st.button('Add to Dictionary'):
         if german_word and english_word:
             existing_entry = dictionary_df[dictionary_df['German'] == german_word]
@@ -153,7 +154,7 @@ if translation_direction == 'German to English':
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
                 # Save the updated dictionary
-                save_dictionary(filepath, dictionary_df)
+                save_dictionary_to_github(github_csv_url, dictionary_df)
 
                 st.write(f'Added: {german_word} -> {english_word}')
             else:
@@ -189,7 +190,7 @@ else:  # English to German
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
                 # Save the updated dictionary
-                save_dictionary(filepath, dictionary_df)
+                save_dictionary_to_github(github_csv_url, dictionary_df)
 
                 st.write(f'Added: {english_word} -> {german_word}')
             else:
@@ -200,6 +201,8 @@ else:  # English to German
 
 # Display the current flashcard and pronounce the word
 current_word = render_flashcard(st.session_state.current_index, st.session_state.flipped)
+
+
 
 # Flashcard navigation
 if st.button('Flip'):
@@ -213,47 +216,14 @@ if st.button('Previous'):
     st.session_state.current_index = (st.session_state.current_index - 1) % len(dictionary_df)
     st.session_state.flipped = False
 
+
 if current_word:
     if st.button('Pronounce2'):
-        pronounce_word(current_word, rate=120)
+        pronounce_word(current_word,rate=120)
 
 # Define grid options
 gb = GridOptionsBuilder.from_dataframe(dictionary_df)
-gb.configure_default_column(width=200)  # Adjust width as needed
+gb.configure_default_column(width=1000)  # Adjust width as needed
 gridOptions = gb.build()
 
-
 AgGrid(dictionary_df, gridOptions=gridOptions, height=400, theme='streamlit')
-
-
-# JavaScript for flip functionality
-st.markdown(
-    """
-    <script>
-    function flipFlashcard() {
-        window.parent.postMessage({
-            isStreamlitMessage: true,
-            type: "flip_flashcard"
-        }, "*");
-    }
-    </script>
-    """, unsafe_allow_html=True
-)
-
-# Add a hidden HTML element to listen for flip events
-st.markdown(
-    """
-    <div id="flashcard-flip-listener"></div>
-    <script>
-    document.getElementById("flashcard-flip-listener").addEventListener("flip_flashcard", function() {
-        window.location.href = window.location.href + '?flip_flashcard=true';
-    });
-    </script>
-    """, unsafe_allow_html=True
-)
-
-# Check if the flip_flashcard event was triggered
-if st.experimental_get_query_params().get('flip_flashcard'):
-    st.session_state.flipped = not st.session_state.flipped
-    # Remove the query parameter
-    st.experimental_set_query_params()
