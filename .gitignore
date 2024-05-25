@@ -17,3 +17,5 @@ logs/              # Log files
 *.idea/.
 *.pkl
 *.toml/.
+*.toml
+
