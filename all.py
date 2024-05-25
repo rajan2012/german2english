@@ -34,7 +34,6 @@ def load_dictionary(file_path):
 def save_dictionary(file_path, df):
     df.to_csv(file_path, index=False)
 
-
 # Load existing dictionary
 #dictionary_df = load_dictionary(filepath)
 
