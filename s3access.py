@@ -9,6 +9,8 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 from gtts import gTTS
 import base64
 
+from loaddata import load_data_s3, save_data_s3
+
 # Initialize translator
 translator = Translator()
 
@@ -34,10 +36,13 @@ def load_dictionary(file_path):
 def save_dictionary(file_path, df):
     df.to_csv(file_path, index=False)
 
+
 # Load existing dictionary
 #dictionary_df = load_dictionary(filepath)
 
-
+bucket='test22-rajan'
+filename='german_english_dictionary.csv'
+dictionary_df = load_data_s3(bucket,filename)
 
 # Initialize session state for the current index and flip state
 if 'current_index' not in st.session_state:
@@ -153,7 +158,7 @@ if translation_direction == 'German to English':
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
                 # Save the updated dictionary
-                save_dictionary(filepath, dictionary_df)
+                save_data_s3(dictionary_df, bucket,filename)
 
                 st.write(f'Added: {german_word} -> {english_word}')
             else:
@@ -189,7 +194,7 @@ else:  # English to German
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
                 # Save the updated dictionary
-                save_dictionary(filepath, dictionary_df)
+                save_data_s3(dictionary_df, bucket,filename)
 
                 st.write(f'Added: {english_word} -> {german_word}')
             else:
