@@ -16,13 +16,12 @@ from loaddata import load_data_s3, save_data_s3
 translator = Translator()
 
 def text_to_speech_url2(text):
-
-def text_to_speech_url(text):
     tts = gTTS(text=text, lang='de')
     tts.save("temp.mp3")
     with open("temp.mp3", "rb") as audio_file:
         audio_bytes = audio_file.read()
         audio_base64 = base64.b64encode(audio_bytes).decode()
+
     return f"data:audio/mp3;base64,{audio_base64}"
 
 
