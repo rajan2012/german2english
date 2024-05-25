@@ -140,6 +140,7 @@ if st.button('Previous'):
     st.session_state.current_index = (st.session_state.current_index - 1) % len(dictionary_df)
     st.session_state.flipped = False
 
+
 # Display the current flashcard
 #render_flashcard(st.session_state.current_index, st.session_state.flipped)
 
