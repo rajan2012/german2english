@@ -69,7 +69,8 @@ def save_dictionary(file_path, df):
 
 bucket='test22-rajan'
 filename='german_english_dictionary.csv'
-dictionary_df = load_data_s3(bucket,filename)
+#last_modified = 0  # Set initial last modified timestamp
+dictionary_df = load_data_s3(bucket, filename)
 
 # Initialize session state for the current index and flip state
 if 'current_index' not in st.session_state:
