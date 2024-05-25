@@ -16,6 +16,8 @@ from loaddata import load_data_s3, save_data_s3
 translator = Translator()
 
 def text_to_speech_url2(text):
+
+def text_to_speech_url(text):
     tts = gTTS(text=text, lang='de')
     tts.save("temp.mp3")
     with open("temp.mp3", "rb") as audio_file:
@@ -52,6 +54,19 @@ def pronounce_word(word, rate=150):
     engine.setProperty('rate', rate)  # Adjust the rate of speech
     engine.say(word)
     engine.runAndWait()
+
+# Function to load dictionary from file
+def load_dictionary(file_path):
+    if os.path.exists(file_path):
+        return pd.read_csv(file_path)
+    else:
+        return pd.DataFrame(columns=['German', 'English'])
+
+# Function to save dictionary to file
+def save_dictionary(file_path, df):
+    df.to_csv(file_path, index=False)
+
+
 
 bucket='test22-rajan'
 filename='german_english_dictionary.csv'
