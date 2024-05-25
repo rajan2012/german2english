@@ -51,6 +51,6 @@ def save_data_s3(df, bucket_name, file_key):
     # Upload the DataFrame as a CSV file to S3
     s3.put_object(Bucket=bucket_name, Key=file_key, Body=csv_buffer.getvalue())
 
-    st.write("CSV file saved and uploaded to S3 successfully!")
+    #st.write("CSV file saved and uploaded to S3 successfully!")
 
 
