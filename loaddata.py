@@ -5,7 +5,7 @@ from io import StringIO
 import streamlit as st
 
 
-@st.cache_data
+#@st.cache_data
 def load_data_s3(bucket_name, file_key):
     # Load AWS credentials from Streamlit secrets
     aws_default_region = st.secrets["aws"]["AWS_DEFAULT_REGION"]
