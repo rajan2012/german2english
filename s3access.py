@@ -172,13 +172,7 @@ if translation_direction == 'German to English':
                 audio_file = open("translated_word_temp3.mp3", "rb")
                 audio_bytes = audio_file.read()
                 st.audio(audio_bytes, format='audio/mp3', start_time=0, autoplay=True)
-        except Exception as e:
-            st.error(f"Error occurred during translation: {e}")
-
-    st.write(english_word)
-
-    if st.button('Add to Dictionary'):
-        if german_word and english_word:
+            # Check if the word is already in the dictionary
             existing_entry = dictionary_df[dictionary_df['German'] == german_word]
             if existing_entry.empty:
                 # Add the translation to the DataFrame
@@ -186,14 +180,14 @@ if translation_direction == 'German to English':
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
                 # Save the updated dictionary
-                save_data_s3(dictionary_df, bucket,filename)
+                save_data_s3(dictionary_df, bucket, filename)
 
                 st.write(f'Added: {german_word} -> {english_word}')
             else:
                 existing_english_word = existing_entry['English'].values[0]
                 st.write(f'The German word "{german_word}" already exists in the dictionary with the English translation: "{existing_english_word}".')
-        else:
-            st.write('Please enter both the German word and its English translation.')
+        except Exception as e:
+            st.error(f"Error occurred during translation: {e}")
 
 else:  # English to German
     # Input for English word
@@ -211,24 +205,22 @@ else:  # English to German
                 audio_file = open("translated_word_temp.mp3", "rb")
                 audio_bytes = audio_file.read()
                 st.audio(audio_bytes, format='audio/mp3', start_time=0, autoplay=True)
-        except Exception as e:
-            st.error(f"Error occurred during translation: {e}")
-
-    if st.button('Add to Dictionary'):
-        if english_word and german_word:
-            if not any(dictionary_df['English'] == english_word):
+            # Check if the word is already in the dictionary
+            existing_entry = dictionary_df[dictionary_df['English'] == english_word]
+            if existing_entry.empty:
                 # Add the translation to the DataFrame
                 new_entry = pd.DataFrame({'German': [german_word], 'English': [english_word]})
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
 
                 # Save the updated dictionary
-                save_data_s3(dictionary_df, bucket,filename)
+                save_data_s3(dictionary_df, bucket, filename)
 
                 st.write(f'Added: {english_word} -> {german_word}')
             else:
-                st.write(f'The English word "{english_word}" already exists in the dictionary.')
-        else:
-            st.write('Please enter both the English word and its German translation.')
+                existing_german_word = existing_entry['German'].values[0]
+                st.write(f'The English word "{english_word}" already exists in the dictionary with the German translation: "{existing_german_word}".')
+        except Exception as e:
+            st.error(f"Error occurred during translation: {e}")
 
 
 # Display the current flashcard and pronounce the word
