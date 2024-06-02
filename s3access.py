@@ -10,7 +10,9 @@ from gtts import gTTS
 import base64
 from io import BytesIO
 
+from images3 import image_slideshow
 from loaddata import load_data_s3, save_data_s3
+
 
 # Initialize translator
 translator = Translator()
@@ -69,6 +71,10 @@ def save_dictionary(file_path, df):
 
 bucket='test22-rajan'
 filename='german_english_dictionary.csv'
+
+# Set the path to your images folder
+images_path = r"C:\Users\User\Documents\german\image"
+
 #last_modified = 0  # Set initial last modified timestamp
 dictionary_df = load_data_s3(bucket, filename)
 
@@ -162,8 +168,6 @@ if st.button('Delete'):
             dictionary_df = dictionary_df[dictionary_df['German'] != delete_input]
             save_data_s3(dictionary_df, bucket, filename)  # Save the updated DataFrame to S3
             st.write(f'The word "{delete_input}" has been deleted from the dictionary.')
-            # Save the updated dictionary
-            save_data_s3(dictionary_df, bucket, filename)
         else:
             st.write(f'The word "{delete_input}" was not found in the dictionary.')
     else:
@@ -299,3 +303,12 @@ if st.experimental_get_query_params().get('flip_flashcard'):
     st.session_state.flipped = not st.session_state.flipped
     # Remove the query parameter
     st.experimental_set_query_params()
+
+
+
+# Set the name of your S3 bucket
+bucket_name = 'image-rajan'  # Replace with your actual bucket name
+
+# Call the function to create the slideshow
+
+image_slideshow(bucket_name)

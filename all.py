@@ -9,6 +9,8 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 from gtts import gTTS
 import base64
 
+from images3 import image_slideshow
+
 # Initialize translator
 translator = Translator()
 

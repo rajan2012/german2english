@@ -53,4 +53,19 @@ def save_data_s3(df, bucket_name, file_key):
 
     #st.write("CSV file saved and uploaded to S3 successfully!")
 
+@st.cache_data
+def get_s3_images(bucket_name, prefix=''):
+    """
+    Fetch image files from an S3 bucket.
 
+    Parameters:
+    bucket_name (str): The name of the S3 bucket.
+    prefix (str): The prefix for the files to fetch (default is '').
+
+    Returns:
+    list: A list of image file keys.
+    """
+    s3 = boto3.client('s3')
+    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+    image_files = [item['Key'] for item in response.get('Contents', []) if item['Key'].endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+    return image_files
