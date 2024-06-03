@@ -316,24 +316,22 @@ bucket_name = 'image-rajan'  # Replace with your actual bucket name
 
 image_slideshow(bucket_name)
 
-# Footer with copyright symbol and contact links
-st.markdown(
-    """
-    <style>
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #ffffff;
-            padding: 10px 0;
-            text-align: center;
-        }
-    </style>
-    <div class="footer">
-        <p>&copy; 2024 rajan. All rights reserved.</p>
-        <p>Contact: <a href="mailto:rajansah8723@gmail.com">email</a> | 
-        <a href="https://www.linkedin.com/in/rajan-sah-0a145495/" target="_blank">LinkedIn</a></p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# Adding the footer with transparent background
+footer = """
+   <style>
+   .footer {
+       position: fixed;
+       left: 0;
+       bottom: 0;
+       width: 100%;
+       background-color: transparent;
+       text-align: center;
+       padding: 10px;
+   }
+   </style>
+   <div class="footer">
+       <p>&copy; 2024 rajan | <a href="mailto:rajansah8723@gmail.com">email</a> | 
+       <a href="https://www.linkedin.com/in/rajan-sah-0a145495">LinkedIn</a></p>
+   </div>
+   """
+st.markdown(footer, unsafe_allow_html=True)
