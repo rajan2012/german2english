@@ -10,6 +10,7 @@ from gtts import gTTS
 import base64
 from io import BytesIO
 
+from eng2germ import english_to_german_translation
 from images3 import image_slideshow
 from loaddata import load_data_s3, save_data_s3
 
@@ -129,6 +130,8 @@ def pronounce_word(word, rate=150):
 
 # Streamlit app
 st.title('Translation Dictionary')
+# Run the method
+english_to_german_translation()
 # Combine search and pronunciation in one box
 st.header('Search or Pronounce a German Word')
 combined_input = st.text_input('Enter a German word to search or pronounce:', '')
@@ -312,3 +315,25 @@ bucket_name = 'image-rajan'  # Replace with your actual bucket name
 # Call the function to create the slideshow
 
 image_slideshow(bucket_name)
+
+# Footer with copyright symbol and contact links
+st.markdown(
+    """
+    <style>
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #ffffff;
+            padding: 10px 0;
+            text-align: center;
+        }
+    </style>
+    <div class="footer">
+        <p>&copy; 2024 rajan. All rights reserved.</p>
+        <p>Contact: <a href="mailto:rajansah8723@gmail.com">email</a> | 
+        <a href="https://www.linkedin.com/in/rajan-sah-0a145495/" target="_blank">LinkedIn</a></p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
