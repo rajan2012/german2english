@@ -215,7 +215,7 @@ if translation_direction == 'German to English':
 
 else:  # English to German
     # Input for English word
-    english_word = st.text_input('Enter an English word:', '')
+    english_word = st.text_input('Enter an English word2:', '')
 
     # Input for German translation using Google Translate API
     german_word = ''
