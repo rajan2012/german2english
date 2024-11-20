@@ -333,7 +333,39 @@ AgGrid(dictionary_df, gridOptions=gridOptions, height=400, theme='streamlit')
 
 ###########################################################################################################################################
 
+# Session state initialization
+if 'current_index' not in st.session_state:
+    st.session_state.current_index = 0
+if 'flipped' not in st.session_state:
+    st.session_state.flipped = False
 
+# Function to render the flashcard
+def render_flashcard(index, flipped):
+    if flipped:
+        st.markdown(f"### {dictionary_df.loc[index, 'English']}")
+    else:
+        st.markdown(f"### {dictionary_df.loc[index, 'German']}")
+
+# Display the flashcard
+st.header("German-English Flashcards")
+render_flashcard(st.session_state.current_index, st.session_state.flipped)
+
+# Flip button
+if st.button("Flip"):
+    st.session_state.flipped = not st.session_state.flipped
+
+# Navigation buttons
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("Previous"):
+        st.session_state.current_index = (st.session_state.current_index - 1) % len(dictionary_df)
+        st.session_state.flipped = False
+
+with col2:
+    if st.button("Next"):
+        st.session_state.current_index = (st.session_state.current_index + 1) % len(dictionary_df)
+        st.session_state.flipped = False
 
 # Set the name of your S3 bucket
 bucket_name = 'image-rajan'  # Replace with your actual bucket name
