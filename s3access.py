@@ -258,6 +258,18 @@ else:  # English to German
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
 
+# if current_word:
+#     if st.button('Pronounce2'):
+#         pronounce_word(current_word, rate=120)
+
+ # Define grid options
+ gb = GridOptionsBuilder.from_dataframe(dictionary_df)
+ gb.configure_default_column(width=200)  # Adjust width as needed
+ gridOptions = gb.build()
+
+ AgGrid(dictionary_df, gridOptions=gridOptions, height=400, theme='streamlit')
+
+
 ##############################################################################################################################
 # # Display the current flashcard and pronounce the word
 # current_word = render_flashcard(st.session_state.current_index, st.session_state.flipped)
