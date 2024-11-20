@@ -133,36 +133,46 @@ st.title('Translation Dictionary')
 # Run the method
 english_to_german_translation()
 german_to_english_translation()
+
+#########################################################################################################################################
 # Combine search and pronunciation in one box
-/*
-st.header('Search or Pronounce a German Word')
-combined_input = st.text_input('Enter a German word to search or pronounce:', '')
+# st.header('Search or Pronounce a German Word')
 
-col1, col2 = st.columns(2)
+# combined_input = st.text_input('Enter a German word to search or pronounce:', '')
 
-with col1:
-    if st.button('Search'):
-        if combined_input:
-            search_result = dictionary_df[dictionary_df['German'].str.contains(combined_input, case=False, na=False)]
-            if not search_result.empty:
-                st.write('Search Results:')
-                st.write(search_result)
-            else:
-                st.write('No results found.')
-        else:
-            st.write('Please enter a German word to search.')
+# col1, col2 = st.columns(2)
 
-with col2:
-    if st.button('Pronounce'):
-        if combined_input:
-            tts = gTTS(text=combined_input, lang='de')
-            tts.save("pronounce_temp.mp3")
-            audio_file = open("pronounce_temp.mp3", "rb")
-            audio_bytes = audio_file.read()
-            st.audio(audio_bytes, format='audio/mp3', start_time=0, autoplay=True)
-        else:
-            st.write('Please enter a German word to pronounce.')
-*/
+# with col1:
+#     if st.button('Search'):  # When the 'Search' button is clicked
+#         if combined_input:  # Check if the user has entered a word
+#             # Search for the entered word in the 'dictionary_df' DataFrame
+#             search_result = dictionary_df[dictionary_df['German'].str.contains(combined_input, case=False, na=False)]
+            
+#             if not search_result.empty:  # If there are matching results
+#                 st.write('Search Results:')
+#                 st.write(search_result)  # Display the results
+#             else:
+#                 st.write('No results found.')  # If no matches found
+#         else:
+#             st.write('Please enter a German word to search.')  # Prompt for input if the field is empty
+
+# with col2:
+#     if st.button('Pronounce'):  # When the 'Pronounce' button is clicked
+#         if combined_input:  # Check if the user has entered a word
+#             # Use gTTS to generate an audio file for the entered word
+#             tts = gTTS(text=combined_input, lang='de')
+#             tts.save("pronounce_temp.mp3")  # Save the generated speech to a temporary file
+
+#             # Open the saved audio file and read its content
+#             audio_file = open("pronounce_temp.mp3", "rb")
+#             audio_bytes = audio_file.read()
+
+#             # Play the audio file in the Streamlit app
+#             st.audio(audio_bytes, format='audio/mp3', start_time=0, autoplay=True)
+#         else:
+#             st.write('Please enter a German word to pronounce.')  # Prompt for input if the field is empty
+
+##################################################################################################################################################
 # Feature to delete a German word from the dictionary
 st.header('Delete a German Word')
 delete_input = st.text_input('Enter a German word to delete:', '')
