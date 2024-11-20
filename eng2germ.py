@@ -21,9 +21,9 @@ def english_to_german_translation():
             audio_file = open("translated_word_temp.mp3", "rb")
             audio_bytes = audio_file.read()
             st.audio(audio_bytes, format='audio/mp3', start_time=0, autoplay=True)
-        else:
-            st.write('enter German Word.')
-            english_word = ''
+       # else:
+        #    st.write('enter German Word.')
+          #  english_word = ''
 
 
 import streamlit as st
