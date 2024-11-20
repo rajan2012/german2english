@@ -10,7 +10,7 @@ from gtts import gTTS
 import base64
 from io import BytesIO
 
-from eng2germ import english_to_german_translation
+from eng2germ import english_to_german_translation, german_to_english_translation
 from images3 import image_slideshow
 from loaddata import load_data_s3, save_data_s3
 
