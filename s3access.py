@@ -263,6 +263,7 @@ else:  # English to German
 #         pronounce_word(current_word, rate=120)
 
 # Define grid options
+st.write("German English Disctionary")
 gb = GridOptionsBuilder.from_dataframe(dictionary_df)
 gb.configure_default_column(width=200)  # Adjust width as needed
 gridOptions = gb.build()
