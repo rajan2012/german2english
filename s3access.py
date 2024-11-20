@@ -134,6 +134,7 @@ st.title('Translation Dictionary')
 english_to_german_translation()
 german_to_english_translation()
 # Combine search and pronunciation in one box
+/*
 st.header('Search or Pronounce a German Word')
 combined_input = st.text_input('Enter a German word to search or pronounce:', '')
 
@@ -161,7 +162,7 @@ with col2:
             st.audio(audio_bytes, format='audio/mp3', start_time=0, autoplay=True)
         else:
             st.write('Please enter a German word to pronounce.')
-
+*/
 # Feature to delete a German word from the dictionary
 st.header('Delete a German Word')
 delete_input = st.text_input('Enter a German word to delete:', '')
