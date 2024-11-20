@@ -132,6 +132,7 @@ def pronounce_word(word, rate=150):
 st.title('Translation Dictionary')
 # Run the method
 english_to_german_translation()
+german_to_english_translation()
 # Combine search and pronunciation in one box
 st.header('Search or Pronounce a German Word')
 combined_input = st.text_input('Enter a German word to search or pronounce:', '')
