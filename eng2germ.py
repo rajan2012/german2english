@@ -41,7 +41,7 @@ def german_to_english_translation():
     english_word = ''
     if german_word:
         english_word = translator.translate(german_word, dest='en', src='de').text
-        st.write(f"Translation in English: {english_word}")
+        st.write(f"{english_word}")
 
         # Option to pronounce the English word
         if st.button('Pronounce 4'):
