@@ -22,7 +22,7 @@ def english_to_german_translation():
             audio_bytes = audio_file.read()
             st.audio(audio_bytes, format='audio/mp3', start_time=0, autoplay=True)
         else:
-            st.write('Please enter a German word to pronounce.')
+            st.write('enter German Word.')
             english_word = ''
 
 
