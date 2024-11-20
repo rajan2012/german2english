@@ -35,7 +35,7 @@ def german_to_english_translation():
     translator = Translator()
 
     # Input for German word
-    german_word = st.text_input('Enter a German word:', '')
+    german_word = st.text_input('Enter German sentence:', '')
 
     # Translate German to English using Google Translate API
     english_word = ''
