@@ -356,9 +356,13 @@ if st.button("Flip"):
         # Show English translation
         st.session_state.flipped = True
     else:
-        # Move to the previous German word and reset flip state
-        st.session_state.current_index = (st.session_state.current_index - 1) % len(df)
+        # Automatically move one row above and reset flip state
+        st.session_state.current_index -= 1
         st.session_state.flipped = False
+
+        # Wrap around to the last word if we go past the first row
+        if st.session_state.current_index < 0:
+            st.session_state.current_index = len(dictionary_df) - 1
 
 # Set the name of your S3 bucket
 bucket_name = 'image-rajan'  # Replace with your actual bucket name
