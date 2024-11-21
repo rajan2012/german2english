@@ -335,7 +335,7 @@ AgGrid(dictionary_df, gridOptions=gridOptions, height=400, theme='streamlit')
 
 # Session state initialization
 if 'current_index' not in st.session_state:
-    st.session_state.current_index = 0
+    st.session_state.current_index = len(dictionary_df) - 1  # Start from the last word
 if 'flipped' not in st.session_state:
     st.session_state.flipped = False
 
@@ -356,8 +356,8 @@ if st.button("Flip"):
         # Show English translation
         st.session_state.flipped = True
     else:
-        # Move to the next German word and reset flip state
-        st.session_state.current_index = (st.session_state.current_index + 1) % len(dictionary_df)
+        # Move to the previous German word and reset flip state
+        st.session_state.current_index = (st.session_state.current_index - 1) % len(df)
         st.session_state.flipped = False
 
 # Set the name of your S3 bucket
