@@ -335,7 +335,7 @@ AgGrid(dictionary_df, gridOptions=gridOptions, height=400, theme='streamlit')
 
 # Session state initialization
 if 'current_index' not in st.session_state:
-    st.session_state.current_index = len(dictionary_df) - 1  # Start from the last word
+    st.session_state.current_index = len(dictionary_df) - 1  # Start from the last row
 if 'flipped' not in st.session_state:
     st.session_state.flipped = False
 
@@ -363,6 +363,7 @@ if st.button("Flip"):
         # Wrap around to the last word if we go past the first row
         if st.session_state.current_index < 0:
             st.session_state.current_index = len(dictionary_df) - 1
+
 
 # Set the name of your S3 bucket
 bucket_name = 'image-rajan'  # Replace with your actual bucket name
