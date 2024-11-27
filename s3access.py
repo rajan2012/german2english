@@ -263,11 +263,14 @@ else:  # English to German
 #         pronounce_word(current_word, rate=120)
 
 # Define grid options
-st.write("German English Disctionary")
+# Reverse the DataFrame to display the last row first
+dictionary_df = dictionary_df.iloc[::-1]
+
+# Streamlit UI
+st.write("German English Dictionary")
 gb = GridOptionsBuilder.from_dataframe(dictionary_df)
 gb.configure_default_column(width=200)  # Adjust width as needed
 gridOptions = gb.build()
-
 
 AgGrid(dictionary_df, gridOptions=gridOptions, height=400, theme='streamlit')
 
