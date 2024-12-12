@@ -366,7 +366,15 @@ if st.button("Flip"):
         # Wrap around to the last word if we go past the first row
         if st.session_state.current_index < 0:
             st.session_state.current_index = len(dictionary_df) - 1
+            
+# Button to move to the previous row (move down)####################################
+if st.button("Previous"):
+    st.session_state.current_index += 1
+    st.session_state.flipped = False
 
+    # Wrap around to the first row if moving past the last row
+    if st.session_state.current_index >= len(dictionary_df):
+        st.session_state.current_index = 0
 
 # Set the name of your S3 bucket
 bucket_name = 'image-rajan'  # Replace with your actual bucket name
