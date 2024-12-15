@@ -174,19 +174,19 @@ german_to_english_translation()
 
 ##################################################################################################################################################
 # Feature to delete a German word from the dictionary
-st.header('Delete a German Word')
-delete_input = st.text_input('Enter a German word to delete:', '')
+#st.header('Delete a German Word')
+#delete_input = st.text_input('Enter a German word to delete:', '')
 
-if st.button('Delete'):
-    if delete_input:
-        if delete_input in dictionary_df['German'].str.lower().values:
-            dictionary_df = dictionary_df[dictionary_df['German'] != delete_input]
-            save_data_s3(dictionary_df, bucket, filename)  # Save the updated DataFrame to S3
-            st.write(f'The word "{delete_input}" has been deleted from the dictionary.')
-        else:
-            st.write(f'The word "{delete_input}" was not found in the dictionary.')
-    else:
-        st.write('Please enter a German word to delete.')
+#if st.button('Delete'):
+ #   if delete_input:
+  #      if delete_input in dictionary_df['German'].str.lower().values:
+   #         dictionary_df = dictionary_df[dictionary_df['German'] != delete_input]
+    #        save_data_s3(dictionary_df, bucket, filename)  # Save the updated DataFrame to S3
+     #       st.write(f'The word "{delete_input}" has been deleted from the dictionary.')
+      #  else:
+       #     st.write(f'The word "{delete_input}" was not found in the dictionary.')
+    #else:
+     #   st.write('Please enter a German word to delete.')
 
 
 # Choose translation direction
