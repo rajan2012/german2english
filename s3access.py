@@ -390,6 +390,8 @@ st.title("S3 Image Carousel Example")
 # Fetch image URLs
 image_urls = image_slideshow2(bucket_name)
 
+st.write(image_urls)
+
 # If images are found, display the carousel
 if image_urls:
     carousel(image_urls)
