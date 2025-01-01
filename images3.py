@@ -56,3 +56,25 @@ def image_slideshow(bucket_name, prefix=''):
     image = Image.open(BytesIO(image_data))
     st.image(image, caption=selected_image_key, use_column_width=True)
 
+
+
+def image_slideshow2(bucket_name, prefix=''):
+    """
+    Fetches and sorts image URLs for a slideshow.
+
+    Parameters:
+    bucket_name (str): The name of the S3 bucket.
+    prefix (str): The prefix for the files to fetch (default is '').
+
+    Returns:
+    list: A sorted list of image URLs.
+    """
+    # Get a list of image files in the bucket
+    image_files = get_s3_images(bucket_name, prefix)
+
+    # Sort the image files to ensure consistent order
+    image_files.sort()
+    return image_files
+
+
+
