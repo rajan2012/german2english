@@ -5,5 +5,7 @@ os
 pyttsx3==2.90
 PyGithub==1.55
 Pillow
+streamlit-carousel
+
 
 
