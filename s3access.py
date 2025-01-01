@@ -392,11 +392,11 @@ image_urls = image_slideshow2(bucket_name)
 
 # If images are found, display the carousel
 if image_urls:
-    carousel(image_urls, height=400)
+    carousel(image_urls)
 else:
     st.write("No images found in the specified S3 folder.")
 
-
+#, height=400
 ###############################################################################################################
     
 
