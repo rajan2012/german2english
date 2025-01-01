@@ -67,14 +67,20 @@ def image_slideshow2(bucket_name, prefix=''):
     prefix (str): The prefix for the files to fetch (default is '').
 
     Returns:
-    list: A sorted list of image URLs.
+    list: A sorted list of image URLs in the required format.
     """
     # Get a list of image files in the bucket
     image_files = get_s3_images(bucket_name, prefix)
 
     # Sort the image files to ensure consistent order
     image_files.sort()
-    return image_files
+
+    # Construct URLs for each image
+    base_url = "https://eu-north-1.console.aws.amazon.com/s3/object/image-rajan?region=eu-north-1&bucketType=general&prefix="
+    image_urls = [f"{base_url}{imagename}" for imagename in image_files]
+
+    return image_urls
+
 
 
 
