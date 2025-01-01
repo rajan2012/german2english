@@ -382,26 +382,26 @@ bucket_name = 'image-rajan'  # Replace with your actual bucket name
 
 # Call the function to create the slideshow
 ##############################################################################################################################
-#image_slideshow(bucket_name)
+image_slideshow(bucket_name)
 
 # Title for Streamlit App
-st.title("S3 Image Carousel Example")
+#st.title("S3 Image Carousel Example")
 
 # Fetch image URLs
-image_urls = image_slideshow2(bucket_name)
+#image_urls = image_slideshow2(bucket_name)
 
 # Debugging step: Display the fetched image URLs
-st.write("Fetched image URLs:", image_urls)
+#st.write("Fetched image URLs:", image_urls)
 
 # If images are found, display the carousel
-if image_urls:
+#if image_urls:
     # Create a list of dictionaries where each dictionary contains 'img' and 'title' keys
-    images_for_carousel = [{'img': url, 'title': f"Image {i+1}"} for i, url in enumerate(image_urls)]
+   # images_for_carousel = [{'img': url, 'title': f"Image {i+1}"} for i, url in enumerate(image_urls)]
     
     # Show the carousel with the formatted image URLs and titles
-    carousel(images_for_carousel)
-else:
-    st.write("No images found in the specified S3 folder.")
+  #  carousel(images_for_carousel)
+#else:
+  #  st.write("No images found in the specified S3 folder.")
 
 #, height=400
 ###############################################################################################################
