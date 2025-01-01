@@ -390,11 +390,14 @@ st.title("S3 Image Carousel Example")
 # Fetch image URLs
 image_urls = image_slideshow2(bucket_name)
 
-st.write(image_urls)
+# Debugging step: Display the fetched image URLs
+st.write("Fetched image URLs:", image_urls)
 
 # If images are found, display the carousel
 if image_urls:
-    carousel(image_urls)
+    # Loop through the image URLs and display them one at a time in the carousel
+    for image_url in image_urls:
+        carousel([image_url])  # carousel takes one image URL at a time
 else:
     st.write("No images found in the specified S3 folder.")
 
