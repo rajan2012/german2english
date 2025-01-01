@@ -395,9 +395,11 @@ st.write("Fetched image URLs:", image_urls)
 
 # If images are found, display the carousel
 if image_urls:
-    # Loop through the image URLs and display them one at a time in the carousel
-    for image_url in image_urls:
-        carousel([image_url])  # carousel takes one image URL at a time
+    # Create a list of dictionaries where each dictionary contains an 'img' key pointing to the image URL
+    images_for_carousel = [{'img': url} for url in image_urls]
+    
+    # Show the carousel with the formatted image URLs
+    carousel(images_for_carousel)
 else:
     st.write("No images found in the specified S3 folder.")
 
