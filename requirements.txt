@@ -8,3 +8,5 @@ streamlit-aggrid==1.0.5
 gtts
 boto3
 Pillow
+streamlit-carousel
+
