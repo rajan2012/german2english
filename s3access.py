@@ -11,8 +11,9 @@ import base64
 from io import BytesIO
 
 from eng2germ import english_to_german_translation, german_to_english_translation
-from images3 import image_slideshow
+from images3 import image_slideshow,image_slideshow2
 from loaddata import load_data_s3, save_data_s3
+from streamlit_carousel import carousel
 
 
 # Initialize translator
@@ -380,8 +381,24 @@ if st.button("Previous"):
 bucket_name = 'image-rajan'  # Replace with your actual bucket name
 
 # Call the function to create the slideshow
+##############################################################################################################################
+#image_slideshow(bucket_name)
 
-image_slideshow(bucket_name)
+# Title for Streamlit App
+st.title("S3 Image Carousel Example")
+
+# Fetch image URLs
+image_urls = image_slideshow2(bucket_name)
+
+# If images are found, display the carousel
+if image_urls:
+    carousel(image_urls, height=400)
+else:
+    st.write("No images found in the specified S3 folder.")
+
+
+###############################################################################################################
+    
 
 # Adding the footer with transparent background
 footer = """
