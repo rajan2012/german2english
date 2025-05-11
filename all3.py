@@ -191,6 +191,9 @@ gb.configure_column("English", header_name="English")
 gb.configure_default_column(editable=False)
 gridOptions = gb.build()
 
+
+st.write(dictionary_df[['English', 'German_HTML'])
+
 # Display the DataFrame using AgGrid
 #'German_HTML', 'English'
 AgGrid(dictionary_df[['English', 'German_HTML']], 
