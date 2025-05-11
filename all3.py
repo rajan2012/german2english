@@ -192,7 +192,8 @@ gb.configure_default_column(editable=False)
 gridOptions = gb.build()
 
 # Display the DataFrame using AgGrid
-AgGrid(dictionary_df[['German_HTML', 'English']], gridOptions=gridOptions, height=400, theme='streamlit',
+#'German_HTML', 'English'
+AgGrid(dictionary_df[['English','German_HTML']], gridOptions=gridOptions, height=400, theme='streamlit',
        allow_unsafe_jscode=True)
 
 # Inject JavaScript for playing audio
