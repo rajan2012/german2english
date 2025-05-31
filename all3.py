@@ -107,6 +107,20 @@ def render_flashcard(index, flipped):
 # Streamlit app
 st.title('Translation Dictionary')
 
+#search for german word and give english word when pressed button
+german_word_search = st.text_input("Enter a German word:")
+
+# If input is given, search for it
+if german_word_search:
+    # Case-insensitive search
+    match = dictionary_df[dictionary_df['German'].str.lower() == german_word_search.lower()]
+
+    if not match.empty:
+        english_translation = match.iloc[0]['English']
+        st.success(f"**English:** {english_translation}")
+    else:
+        st.warning("Word not found in the dictionary.")
+
 # Choose translation direction
 translation_direction = st.radio('Select translation direction:', ('German to English', 'English to German'))
 
@@ -191,19 +205,7 @@ gb.configure_column("English", header_name="English")
 gb.configure_default_column(editable=False)
 gridOptions = gb.build()
 
-#search for german word and give english word when pressed button
-german_word_search = st.text_input("Enter a German word:")
 
-# If input is given, search for it
-if german_word_search:
-    # Case-insensitive search
-    match = dictionary_df[dictionary_df['German'].str.lower() == german_word_search.lower()]
-
-    if not match.empty:
-        english_translation = match.iloc[0]['English']
-        st.success(f"**English:** {english_translation}")
-    else:
-        st.warning("Word not found in the dictionary.")
 
 st.write(dictionary_df[['English', 'German_HTML'])
 
