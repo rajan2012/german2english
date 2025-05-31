@@ -143,7 +143,7 @@ if german_word_s:
 
     if not match.empty:
         english_translation = match.iloc[0]['English']
-        st.success(f"**English:** {english_translation}")
+        st.success(f"{english_translation}")
     else:
         st.warning("Word not found in the dictionary.")
 
