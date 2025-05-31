@@ -281,7 +281,7 @@ else:  # English to German
 
 # Define grid options
 # Reverse the DataFrame to display the last row first
-dictionary_df = dictionary_df.iloc[::-1]['English','German']
+dictionary_df = dictionary_df.iloc[::-1][['English', 'German']]
 
 # Streamlit UI
 st.write("German English Dictionary")
