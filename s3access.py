@@ -80,6 +80,20 @@ images_path = r"C:\Users\User\Documents\german\image"
 #last_modified = 0  # Set initial last modified timestamp
 dictionary_df = load_data_s3(bucket, filename)
 
+# Input box for German word
+german_word_s = st.text_input("Enter a German word:")
+
+# If input is given, search for it
+if german_word_s:
+    # Case-insensitive search
+    match = dictionary_df[dictionary_df['German'].str.lower() == german_word_s.lower()]
+
+    if not match.empty:
+        english_translation = match.iloc[0]['English']
+        st.success(f"**English:** {english_translation}")
+    else:
+        st.warning("Word not found in the dictionary.")
+
 # Initialize session state for the current index and flip state
 if 'current_index' not in st.session_state:
     st.session_state.current_index = 0
