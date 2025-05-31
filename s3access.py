@@ -81,7 +81,7 @@ images_path = r"C:\Users\User\Documents\german\image"
 dictionary_df = load_data_s3(bucket, filename)
 
 # Input box for German word
-german_word_s = st.text_input("Enter a German word:")
+german_word_s = st.text_input("Enter a German word for search:")
 
 # If input is given, search for it
 if german_word_s:
