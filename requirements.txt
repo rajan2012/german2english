@@ -10,6 +10,6 @@ boto3
 Pillow
 streamlit-carousel
 langdetect==1.0.9
-pywin32
+#pywin32
 
 
