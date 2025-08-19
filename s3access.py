@@ -9,11 +9,15 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 from gtts import gTTS
 import base64
 from io import BytesIO
+import string
+import re
 
 from eng2germ import english_to_german_translation, german_to_english_translation
 from images3 import image_slideshow,image_slideshow2
 from loaddata import load_data_s3, save_data_s3
 from streamlit_carousel import carousel
+from langdetect import detect, DetectorFactory
+DetectorFactory.seed = 0  # for consistent results
 
 
 # Initialize translator
@@ -70,6 +74,110 @@ def load_dictionary(file_path):
 def save_dictionary(file_path, df):
     df.to_csv(file_path, index=False)
 
+
+# Function to preprocess sentence
+def preprocess_sentence(sentence):
+    # Remove punctuation
+    sentence = sentence.translate(str.maketrans('', '', string.punctuation))
+    # Remove digits and other non-alphabetic symbols
+    sentence = re.sub(r'[^a-zA-ZäöüßÄÖÜ ]', '', sentence)  # keeps letters and spaces, including German umlauts
+    # Convert to lowercase
+    sentence = sentence.lower()
+    # Split by space
+    words = sentence.split()
+    # Trim and keep words with length >= 3
+    words = [word.strip() for word in words if len(word) >= 3]
+    return words
+
+# Function to automatically add new words with translation
+from langdetect import detect
+
+# Function to automatically add new words with translation
+def update_dictionary_auto(new_words, dictionary_df):
+    added_words = []
+
+    # Robust English detection
+    english_count = 0
+    for word in new_words:
+        try:
+            lang = detect(word)
+        except:
+            lang = 'unknown'
+        # Count as English if detected or contains only ASCII letters
+        if lang == 'en' or all(c.isascii() and c.isalpha() for c in word):
+            english_count += 1
+
+    #st.write("english_count", english_count)
+    #st.write("new_words", len(new_words))
+
+    # Raise exception if sentence is mostly English
+    if english_count >= 5 or english_count == len(new_words):
+        raise ValueError("The entered sentence appears to be English. Please enter a German sentence.")
+
+    for word in new_words:
+        try:
+            lang = detect(word)
+        except:
+            lang = 'unknown'
+
+        # Skip words that are already English
+        if lang == 'en' or all(c.isascii() and c.isalpha() for c in word):
+            continue
+
+        if word not in dictionary_df['German'].values:
+            # Translate to English and convert to lowercase
+            english_translation = translator.translate(word, src='de', dest='en').text.lower()
+            dictionary_df = pd.concat(
+                [dictionary_df, pd.DataFrame({'English': [english_translation], 'German': [word]})],
+                ignore_index=True
+            )
+            added_words.append((word, english_translation))
+
+    return dictionary_df, added_words
+
+
+# Function to automatically add new words with translation
+def update_dictionary_auto_eng2de(new_words, dictionary_df):
+    added_words = []
+
+    # Robust German detection
+    german_count = 0
+    for word in new_words:
+        try:
+            lang = detect(word)
+        except:
+            lang = 'unknown'
+        # Count as German if detected or contains German special characters
+        if lang == 'de' or any(c in word for c in 'äöüß'):
+            german_count += 1
+
+    #st.write("german_count", german_count)
+    #st.write("new_words", len(new_words))
+
+    # Raise exception if sentence is mostly German
+    if german_count >= 5 or german_count == len(new_words):
+        raise ValueError("Please enter an English sentence, not German.")
+
+    for word in new_words:
+        try:
+            lang = detect(word)
+        except:
+            lang = 'unknown'
+
+        # Skip words that are already German
+        if lang == 'de' or any(c in word for c in 'äöüß'):
+            continue
+
+        if word not in dictionary_df['English'].values:
+            # Translate to German and convert to lowercase
+            german_translation = translator.translate(word, src='en', dest='de').text.lower()
+            dictionary_df = pd.concat(
+                [dictionary_df, pd.DataFrame({'English': [word], 'German': [german_translation]})],
+                ignore_index=True
+            )
+            added_words.append((word, german_translation))
+
+    return dictionary_df, added_words
 
 
 bucket='test22-rajan'
@@ -148,63 +256,50 @@ if german_word_s:
     else:
         st.warning("Word not found in the dictionary.")
 
+########enter sentence
+german_sentence = st.text_input("Enter a German sentence")
+
+if german_sentence:
+    words = preprocess_sentence(german_sentence)
+    st.write("Words extracted:", words)
+
+    # Update dictionary automatically
+    dictionary_df, new_words_added = update_dictionary_auto(words, dictionary_df)
+    save_data_s3(dictionary_df, bucket, filename)
+
+    if new_words_added:
+        # Display each new word with its translation
+        display_text = "\n".join([f"{de} → {en}" for de, en in new_words_added])
+        st.text("New words added:\n" + display_text)
+    else:
+        st.info("All words already exist in dictionary.")
+
+
+
+english_sentence = st.text_input("Enter a english sentence")
+
+if english_sentence:
+    words = preprocess_sentence(english_sentence)
+    st.write("Words extracted:", words)
+
+    # Update dictionary automatically
+    dictionary_df, new_words_added = update_dictionary_auto_eng2de(words, dictionary_df)
+    save_data_s3(dictionary_df, bucket, filename)
+
+    if new_words_added:
+        # Display each new word with its German translation
+        display_text = "\n".join([f"{en} → {de}" for en, de in new_words_added])
+        st.text("New words added:\n" + display_text)
+    else:
+        st.info("All words already exist in dictionary.")
+
+    # Pronounce button
+    if st.button("Pronounce15"):
+        pronounce_word(english_sentence)
+
 # Run the method
 english_to_german_translation()
 german_to_english_translation()
-
-#########################################################################################################################################
-# Combine search and pronunciation in one box
-# st.header('Search or Pronounce a German Word')
-
-# combined_input = st.text_input('Enter a German word to search or pronounce:', '')
-
-# col1, col2 = st.columns(2)
-
-# with col1:
-#     if st.button('Search'):  # When the 'Search' button is clicked
-#         if combined_input:  # Check if the user has entered a word
-#             # Search for the entered word in the 'dictionary_df' DataFrame
-#             search_result = dictionary_df[dictionary_df['German'].str.contains(combined_input, case=False, na=False)]
-            
-#             if not search_result.empty:  # If there are matching results
-#                 st.write('Search Results:')
-#                 st.write(search_result)  # Display the results
-#             else:
-#                 st.write('No results found.')  # If no matches found
-#         else:
-#             st.write('Please enter a German word to search.')  # Prompt for input if the field is empty
-
-# with col2:
-#     if st.button('Pronounce'):  # When the 'Pronounce' button is clicked
-#         if combined_input:  # Check if the user has entered a word
-#             # Use gTTS to generate an audio file for the entered word
-#             tts = gTTS(text=combined_input, lang='de')
-#             tts.save("pronounce_temp.mp3")  # Save the generated speech to a temporary file
-
-#             # Open the saved audio file and read its content
-#             audio_file = open("pronounce_temp.mp3", "rb")
-#             audio_bytes = audio_file.read()
-
-#             # Play the audio file in the Streamlit app
-#             st.audio(audio_bytes, format='audio/mp3', start_time=0, autoplay=True)
-#         else:
-#             st.write('Please enter a German word to pronounce.')  # Prompt for input if the field is empty
-
-##################################################################################################################################################
-# Feature to delete a German word from the dictionary
-#st.header('Delete a German Word')
-#delete_input = st.text_input('Enter a German word to delete:', '')
-
-#if st.button('Delete'):
- #   if delete_input:
-  #      if delete_input in dictionary_df['German'].str.lower().values:
-   #         dictionary_df = dictionary_df[dictionary_df['German'] != delete_input]
-    #        save_data_s3(dictionary_df, bucket, filename)  # Save the updated DataFrame to S3
-     #       st.write(f'The word "{delete_input}" has been deleted from the dictionary.')
-      #  else:
-       #     st.write(f'The word "{delete_input}" was not found in the dictionary.')
-    #else:
-     #   st.write('Please enter a German word to delete.')
 
 
 # Choose translation direction

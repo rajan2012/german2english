@@ -1,8 +1,17 @@
 import streamlit as st
 import pandas as pd
 import os
+from googletrans import Translator
 import pyttsx3
+from io import StringIO
 from st_aggrid import AgGrid, GridOptionsBuilder
+from gtts import gTTS
+import base64
+from io import BytesIO
+
+from eng2germ import english_to_german_translation, german_to_english_translation
+from images3 import image_slideshow,image_slideshow2
+from loaddata import load_data_s3, save_data_s3
 
 # Filepath for the dictionary
 filepath = "german_english_dictionary.csv"
