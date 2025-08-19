@@ -19,6 +19,7 @@ from streamlit_carousel import carousel
 # Initialize translator
 translator = Translator()
 
+
 def text_to_speech_url2(text):
     tts = gTTS(text=text, lang='de')
     tts.save("temp.mp3")
