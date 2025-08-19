@@ -95,7 +95,6 @@ from langdetect import detect
 # Function to automatically add new words with translation
 def update_dictionary_auto(new_words, dictionary_df):
     added_words = []
-
     # Robust English detection
     english_count = 0
     for word in new_words:
