@@ -313,7 +313,7 @@ if translation_direction == 'German to English':
     english_word = ''
     if german_word:
         try:
-            english_word = translator.translate(german_word, dest='en', src='de').text
+            english_word = translator.translate(german_word, dest='en', src='de').text.lower()
             st.write(english_word)
             if st.button('Pronounce German Word22'):
                 tts = gTTS(text=german_word, lang='de')
@@ -346,7 +346,7 @@ else:  # English to German
     german_word = ''
     if english_word:
         try:
-            german_word = translator.translate(english_word, dest='de', src='en').text
+            german_word = translator.translate(english_word, dest='de', src='en').text.lower()
             st.write(german_word)
             if st.button('Pronounce Translated Word'):
                 tts = gTTS(text=german_word, lang='de')
