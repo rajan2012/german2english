@@ -19,3 +19,33 @@ logs/              # Log files
 *.toml/.
 *.toml
 
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE settings (PyCharm)
+.idea/
+
+# VSCode settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Optional: compiled C extensions
+*.so
+
+# Optional: packages
+*.egg
+*.egg-info/
+dist/
+build/
