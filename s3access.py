@@ -123,16 +123,29 @@ def update_dictionary_auto(new_words, dictionary_df):
         if lang == 'en':
             continue
 
-        if word not in dictionary_df['German'].values:
-            # Translate to English and convert to lowercase
-            english_translation = translator.translate(word, src='de', dest='en').text.lower()
-            dictionary_df = pd.concat(
-                [dictionary_df, pd.DataFrame({'English': [english_translation], 'German': [word]})],
-                ignore_index=True
-            )
-            added_words.append((word, english_translation))
+        # Convert word to lowercase for comparison
+        word_lower = word.lower()
+
+        # Skip if word already exists in dictionary (compare lowercase)
+        if word_lower in dictionary_df['German'].str.lower().values:
+            continue
+
+        # Translate to English and convert to lowercase
+        english_translation = translator.translate(word, src='de', dest='en').text.lower()
+
+        # Skip if translation is same as original word
+        if english_translation == word_lower:
+            continue
+
+        # Add to dictionary
+        dictionary_df = pd.concat(
+            [dictionary_df, pd.DataFrame({'English': [english_translation], 'German': [word_lower]})],
+            ignore_index=True
+        )
+        added_words.append((word_lower, english_translation))
 
     return dictionary_df, added_words
+
 
 
 # Function to automatically add new words with translation
@@ -150,14 +163,13 @@ def update_dictionary_auto_eng2de(new_words, dictionary_df):
         if lang == 'de' or any(c in word for c in 'äöüß'):
             german_count += 1
 
-    #st.write("german_count", german_count)
-    #st.write("new_words", len(new_words))
-
     # Raise exception if sentence is mostly German
     if german_count >= 50 or german_count == len(new_words):
         raise ValueError("Please enter an English sentence, not German.")
 
     for word in new_words:
+        word_lower = word.lower()  # Convert word to lowercase
+
         try:
             lang = detect(word)
         except:
@@ -167,16 +179,26 @@ def update_dictionary_auto_eng2de(new_words, dictionary_df):
         if lang == 'de' or any(c in word for c in 'äöüß'):
             continue
 
-        if word not in dictionary_df['English'].values:
-            # Translate to German and convert to lowercase
-            german_translation = translator.translate(word, src='en', dest='de').text.lower()
-            dictionary_df = pd.concat(
-                [dictionary_df, pd.DataFrame({'English': [word], 'German': [german_translation]})],
-                ignore_index=True
-            )
-            added_words.append((word, german_translation))
+        # Skip if word already exists in dictionary (compare lowercase)
+        if word_lower in dictionary_df['English'].str.lower().values:
+            continue
+
+        # Translate to German and convert to lowercase
+        german_translation = translator.translate(word, src='en', dest='de').text.lower()
+
+        # Skip if translation is same as original word
+        if german_translation == word_lower:
+            continue
+
+        # Add to dictionary
+        dictionary_df = pd.concat(
+            [dictionary_df, pd.DataFrame({'English': [word_lower], 'German': [german_translation]})],
+            ignore_index=True
+        )
+        added_words.append((word_lower, german_translation))
 
     return dictionary_df, added_words
+
 
 
 bucket='test22-rajan'
