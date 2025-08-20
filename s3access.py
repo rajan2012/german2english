@@ -110,7 +110,7 @@ def update_dictionary_auto(new_words, dictionary_df):
     st.write("new_words", len(new_words))
 
     # Raise exception if sentence is mostly English
-    if english_count >= 5 or english_count == len(new_words):
+    if english_count >= 50 or english_count == len(new_words):
         raise ValueError("The entered sentence appears to be English. Please enter a German sentence.")
 
     for word in new_words:
@@ -154,7 +154,7 @@ def update_dictionary_auto_eng2de(new_words, dictionary_df):
     #st.write("new_words", len(new_words))
 
     # Raise exception if sentence is mostly German
-    if german_count >= 5 or german_count == len(new_words):
+    if german_count >= 50 or german_count == len(new_words):
         raise ValueError("Please enter an English sentence, not German.")
 
     for word in new_words:
