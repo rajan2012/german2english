@@ -106,8 +106,8 @@ def update_dictionary_auto(new_words, dictionary_df):
         if lang == 'en' or all(c.isascii() and c.isalpha() for c in word):
             english_count += 1
 
-    #st.write("english_count", english_count)
-    #st.write("new_words", len(new_words))
+    st.write("english_count", english_count)
+    st.write("new_words", len(new_words))
 
     # Raise exception if sentence is mostly English
     if english_count >= 5 or english_count == len(new_words):
