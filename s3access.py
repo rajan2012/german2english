@@ -103,7 +103,7 @@ def update_dictionary_auto(new_words, dictionary_df):
         except:
             lang = 'unknown'
         # Count as English if detected or contains only ASCII letters
-        if lang == 'en' or all(c.isascii() and c.isalpha() for c in word):
+        if lang == 'en':
             english_count += 1
 
     st.write("english_count", english_count)
@@ -120,7 +120,7 @@ def update_dictionary_auto(new_words, dictionary_df):
             lang = 'unknown'
 
         # Skip words that are already English
-        if lang == 'en' or all(c.isascii() and c.isalpha() for c in word):
+        if lang == 'en':
             continue
 
         if word not in dictionary_df['German'].values:
