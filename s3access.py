@@ -22,7 +22,6 @@ DetectorFactory.seed = 0  # for consistent results
 translator = Translator()
 
 def text_to_speech_url2(text: str) -> str:
-    """gTTS to MP3 (file) and return as data URL."""
     tts = gTTS(text=text, lang='de')
     tts.save("temp.mp3")
     with open("temp.mp3", "rb") as audio_file:
@@ -31,7 +30,6 @@ def text_to_speech_url2(text: str) -> str:
     return f"data:audio/mp3;base64,{audio_base64}"
 
 def text_to_speech_url(text: str) -> str:
-    """gTTS to MP3 (in-memory) and return as data URL."""
     tts = gTTS(text=text, lang='de')
     audio_bytes_io = BytesIO()
     tts.write_to_fp(audio_bytes_io)
@@ -46,36 +44,25 @@ def pronounce_word(word: str, rate: int = 150):
     engine.say(word)
     engine.runAndWait()
 
-# Function to load dictionary from S3 and normalize to lowercase
+# Load dictionary from S3 with lowercase normalization
 def load_dictionary_s3_lower(bucket: str, filename: str) -> pd.DataFrame:
     df = load_data_s3(bucket, filename)
     if df is None or df.empty:
         df = pd.DataFrame(columns=['German', 'English'])
-    # Normalize columns to lowercase strings
-    if 'German' not in df.columns or 'English' not in df.columns:
-        # Attempt to repair column names if possible
-        cols_lower = {c.lower(): c for c in df.columns}
-        german_col = cols_lower.get('german')
-        english_col = cols_lower.get('english')
-        if german_col and english_col:
-            df = df.rename(columns={german_col: 'German', english_col: 'English'})
-        else:
-            df = pd.DataFrame(columns=['German', 'English'])
+    # Normalize to lowercase
     df['German'] = df['German'].astype(str).str.strip().str.lower()
     df['English'] = df['English'].astype(str).str.strip().str.lower()
-    # Drop exact duplicates post-normalization
     df = df.drop_duplicates(subset=['German', 'English']).reset_index(drop=True)
     return df
 
 def save_dictionary_s3_lower(df: pd.DataFrame, bucket: str, filename: str):
-    # Ensure lowercase before saving
     df = df.copy()
     df['German'] = df['German'].astype(str).str.strip().str.lower()
     df['English'] = df['English'].astype(str).str.strip().str.lower()
     df = df.drop_duplicates(subset=['German', 'English']).reset_index(drop=True)
     save_data_s3(df, bucket, filename)
 
-# Sentence preprocessor (removes punctuation/digits, keeps umlauts, lowercase)
+# Preprocess sentence: remove punctuation/digits, keep umlauts, lowercase
 def preprocess_sentence(sentence: str):
     sentence = sentence.translate(str.maketrans('', '', string.punctuation))
     sentence = re.sub(r'[^a-zA-ZäöüßÄÖÜ ]', '', sentence)
@@ -84,112 +71,65 @@ def preprocess_sentence(sentence: str):
     words = [w.strip() for w in words if len(w) >= 3]
     return words
 
-# Auto-add: German -> English
+# Auto-add German -> English
 def update_dictionary_auto(new_words, dictionary_df):
     added_words = []
-    # Count English-like tokens to guard against wrong direction
-    english_count = 0
-    for word in new_words:
-        try:
-            lang = detect(word)
-        except Exception:
-            lang = 'unknown'
-        if lang == 'en':
-            english_count += 1
-
-    # Safety: likely English sentence
+    english_count = sum(1 for word in new_words if detect(word) == 'en')
     if english_count >= 50 or english_count == len(new_words):
         raise ValueError("The entered sentence appears to be English. Please enter a German sentence.")
-
     for word in new_words:
-        try:
-            lang = detect(word)
-        except Exception:
-            lang = 'unknown'
-        # Skip words that are already English
-        if lang == 'en':
-            continue
-
         word_lower = word.strip().lower()
-        # Skip if already exists
         if word_lower in dictionary_df['German'].str.lower().values:
             continue
-
-        # Translate to English (lowercase)
         try:
             english_translation = translator.translate(word_lower, src='de', dest='en').text.lower().strip()
-        except Exception:
-            # If translation fails, skip
+        except:
             continue
-
-        # Skip if no real change
+        # Skip if translation already exists
+        if english_translation in dictionary_df['English'].str.lower().values:
+            continue
         if english_translation == word_lower:
             continue
-
         dictionary_df = pd.concat(
-            [dictionary_df, pd.DataFrame({'English': [english_translation], 'German': [word_lower]})],
+            [dictionary_df, pd.DataFrame({'German': [word_lower], 'English': [english_translation]})],
             ignore_index=True
         )
         added_words.append((word_lower, english_translation))
-
     return dictionary_df, added_words
 
-# Auto-add: English -> German
+# Auto-add English -> German
 def update_dictionary_auto_eng2de(new_words, dictionary_df):
     added_words = []
-
-    german_count = 0
-    for word in new_words:
-        try:
-            lang = detect(word)
-        except Exception:
-            lang = 'unknown'
-        if lang == 'de' or any(c in word for c in 'äöüß'):
-            german_count += 1
-
-    # Safety: likely German sentence
+    german_count = sum(1 for word in new_words if detect(word) == 'de' or any(c in word for c in 'äöüß'))
     if german_count >= 50 or german_count == len(new_words):
         raise ValueError("Please enter an English sentence, not German.")
-
     for word in new_words:
         word_lower = word.strip().lower()
-        try:
-            lang = detect(word)
-        except Exception:
-            lang = 'unknown'
-
-        # Skip words that are already German-ish
-        if lang == 'de' or any(c in word for c in 'äöüß'):
-            continue
-
-        # Skip if already exists (case-insensitive)
         if word_lower in dictionary_df['English'].str.lower().values:
             continue
-
-        # Translate to German (lowercase)
         try:
             german_translation = translator.translate(word_lower, src='en', dest='de').text.lower().strip()
-        except Exception:
+        except:
             continue
-
+        # Skip if translation already exists
+        if german_translation in dictionary_df['German'].str.lower().values:
+            continue
         if german_translation == word_lower:
             continue
-
         dictionary_df = pd.concat(
             [dictionary_df, pd.DataFrame({'English': [word_lower], 'German': [german_translation]})],
             ignore_index=True
         )
         added_words.append((word_lower, german_translation))
-
     return dictionary_df, added_words
 
-# ----------------- App Constants -----------------
+# ----------------- Constants -----------------
 bucket = 'test22-rajan'
 filename = 'german_english_dictionary.csv'
 images_path = r"C:\Users\User\Documents\german\image"
 bucket_name_images = 'image-rajan'
 
-# ----------------- Load Dictionary -----------------
+# ----------------- Load dictionary -----------------
 dictionary_df = load_dictionary_s3_lower(bucket, filename)
 
 # ----------------- Session State -----------------
@@ -201,7 +141,7 @@ if 'flipped' not in st.session_state:
 # ----------------- UI -----------------
 st.title('Translation Dictionary')
 
-# ---- Search exact German word (case-insensitive) ----
+# ---- Search German word ----
 german_word_s = st.text_input("Enter a German word for search:").strip().lower()
 if german_word_s:
     match = dictionary_df[dictionary_df['German'].str.lower() == german_word_s]
@@ -211,10 +151,10 @@ if german_word_s:
     else:
         st.warning("Word not found in the dictionary.")
 
-# ---- German sentence -> auto add (de->en) ----
+# ---- German sentence -> auto add ----
 german_sentence = st.text_input("Enter a German sentence").strip().lower()
 if german_sentence:
-    words = preprocess_sentence(german_sentence)  # already lowercased
+    words = preprocess_sentence(german_sentence)
     st.write("Words extracted:", words)
     try:
         dictionary_df, new_words_added = update_dictionary_auto(words, dictionary_df)
@@ -227,10 +167,10 @@ if german_sentence:
     except ValueError as e:
         st.error(str(e))
 
-# ---- English sentence -> auto add (en->de) ----
+# ---- English sentence -> auto add ----
 english_sentence = st.text_input("Enter an English sentence").strip().lower()
 if english_sentence:
-    words = preprocess_sentence(english_sentence)  # already lowercased
+    words = preprocess_sentence(english_sentence)
     st.write("Words extracted:", words)
     try:
         dictionary_df, new_words_added = update_dictionary_auto_eng2de(words, dictionary_df)
@@ -242,15 +182,14 @@ if english_sentence:
             st.info("All words already exist in dictionary.")
     except ValueError as e:
         st.error(str(e))
-
     if st.button("Pronounce15"):
         pronounce_word(english_sentence)
 
-# Run the custom modules (unchanged)
+# Run custom modules
 english_to_german_translation()
 german_to_english_translation()
 
-# ---- Manual translation direction ----
+# ---- Manual translation ----
 translation_direction = st.radio('Select translation direction:', ('German to English', 'English to German'))
 
 if translation_direction == 'German to English':
@@ -259,60 +198,50 @@ if translation_direction == 'German to English':
         try:
             english_word = translator.translate(german_word, dest='en', src='de').text.lower().strip()
             st.write(english_word)
-
             if st.button('Pronounce German Word22'):
                 tts = gTTS(text=german_word, lang='de')
                 tts.save("translated_word_temp3.mp3")
                 with open("translated_word_temp3.mp3", "rb") as f:
                     st.audio(f.read(), format='audio/mp3', start_time=0, autoplay=True)
-
-            # Case-insensitive existence check
-            exists = dictionary_df['German'].str.lower() == german_word
+            exists = ((dictionary_df['German'].str.lower() == german_word) |
+                      (dictionary_df['English'].str.lower() == english_word))
             if not exists.any():
                 new_entry = pd.DataFrame({'German': [german_word], 'English': [english_word]})
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
                 save_dictionary_s3_lower(dictionary_df, bucket, filename)
                 st.write(f'Added: {german_word} -> {english_word}')
             else:
-                existing_english_word = dictionary_df.loc[exists, 'English'].iloc[0]
-                st.write(f'The German word "{german_word}" already exists with English: "{existing_english_word}".')
+                st.write(f'The German word "{german_word}" or its English translation already exists.')
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
-
-else:  # English to German
+else:
     english_word = st.text_input('Enter an English word2:', '').strip().lower()
     if english_word:
         try:
             german_word = translator.translate(english_word, dest='de', src='en').text.lower().strip()
             st.write(german_word)
-
             if st.button('Pronounce Translated Word'):
                 tts = gTTS(text=german_word, lang='de')
                 tts.save("translated_word_temp.mp3")
                 with open("translated_word_temp.mp3", "rb") as f:
                     st.audio(f.read(), format='audio/mp3', start_time=0, autoplay=True)
-
-            exists = dictionary_df['English'].str.lower() == english_word
+            exists = ((dictionary_df['English'].str.lower() == english_word) |
+                      (dictionary_df['German'].str.lower() == german_word))
             if not exists.any():
                 new_entry = pd.DataFrame({'German': [german_word], 'English': [english_word]})
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
                 save_dictionary_s3_lower(dictionary_df, bucket, filename)
                 st.write(f'Added: {english_word} -> {german_word}')
             else:
-                existing_german_word = dictionary_df.loc[exists, 'German'].iloc[0]
-                st.write(f'The English word "{english_word}" already exists with German: "{existing_german_word}".')
+                st.write(f'The English word "{english_word}" or its German translation already exists.')
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
 
-# ----------------- Table (latest first) -----------------
-# Normalize again to be safe before display
+# ----------------- Table -----------------
 dictionary_df['German'] = dictionary_df['German'].astype(str).str.strip().str.lower()
 dictionary_df['English'] = dictionary_df['English'].astype(str).str.strip().str.lower()
 dictionary_df = dictionary_df.drop_duplicates(subset=['German', 'English']).reset_index(drop=True)
-
-# Reverse to show most recent additions first
 display_df = dictionary_df.iloc[::-1][['English', 'German']]
-
 st.write("German English Dictionary")
 gb = GridOptionsBuilder.from_dataframe(display_df)
 gb.configure_default_column(width=200)
