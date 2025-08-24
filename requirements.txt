@@ -10,6 +10,8 @@ boto3
 Pillow
 streamlit-carousel
 langdetect==1.0.9
+#mysql-connector-python==8.0.34
+#numpy<2
 #pywin32
 
 
