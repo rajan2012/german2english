@@ -211,7 +211,7 @@ if translation_direction == 'German to English':
                 save_dictionary_s3_lower(dictionary_df, bucket, filename)
                 st.write(f'Added: {german_word} -> {english_word}')
             else:
-                st.write(f'The German word "{german_word}" or its English translation already exists.')
+                st.write(f'The German word "{german_word}" or its English translation {english_word} already exists.')
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
 else:
