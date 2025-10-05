@@ -314,35 +314,13 @@ except:
     st.sidebar.error("Invalid range format. Use start-end like 0-100")
     start_idx, end_idx = 0, 200
 
+#st.write(start_idx,end_idx)
 st.header("German-English Flashcards")
-if 'flashcards_df' not in st.session_state:
-    # Sort by DateAdded descending and take the last 50 words
-    st.session_state.flashcards_df = display_df.sort_values(
-        by='DateAdded', ascending=False
-    ).iloc[start_idx:end_idx].reset_index(drop=True)
+# Always update flashcards_df according to range
+flashcards_df = display_df.sort_values(by='DateAdded', ascending=False).iloc[start_idx:end_idx].reset_index(drop=True)
+st.session_state.flashcards_df = flashcards_df
 
-flashcards_df = st.session_state.flashcards_df
-
-# Placeholder to update only flashcard
-flashcard_placeholder = st.empty()
-
-# ------------------ Session state ------------------
-if 'flash_index' not in st.session_state:
-    st.session_state.flash_index = 0
-if 'flipped' not in st.session_state:
-    st.session_state.flipped = False
-
-# ------------------ Flashcard render ------------------
-
-# ------------------ Buttons ------------------
-
-if 'flashcards_df' not in st.session_state:
-    # Sort by DateAdded descending and take the last 200 words
-    st.session_state.flashcards_df = display_df.sort_values(
-        by='DateAdded', ascending=False
-    ).head(200).reset_index(drop=True)
-
-flashcards_df = st.session_state.flashcards_df
+#flashcards_df = st.session_state.flashcards_df
 
 # Placeholder to update only flashcard
 flashcard_placeholder = st.empty()
