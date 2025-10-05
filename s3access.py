@@ -269,7 +269,7 @@ else:
                 new_entry = pd.DataFrame({
                     'German': [german_word],
                     'English': [english_word],
-                    'dateadd': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
+                    'DateAdded': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
                 })
                 dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
                 st.write(f'Added: {english_word} -> {german_word}')
