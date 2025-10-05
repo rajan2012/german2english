@@ -296,6 +296,7 @@ AgGrid(display_df, gridOptions=gridOptions, height=400, theme='streamlit')
 
 # ----------------- Flashcards -----------------
 # ------------------ Prepare flashcards_df ------------------
+st.header("German-English Flashcards")
 if 'flashcards_df' not in st.session_state:
     # Sort by DateAdded descending and take the last 50 words
     st.session_state.flashcards_df = display_df.sort_values(
@@ -326,7 +327,6 @@ def render_flashcard():
     else:
         flashcard_placeholder.markdown(f"### {word_row['German']}")
 
-st.header("German-English Flashcards")
 render_flashcard()
 
 # ------------------ Buttons ------------------
