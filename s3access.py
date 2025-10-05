@@ -62,7 +62,7 @@ def save_dictionary_s3_lower(df: pd.DataFrame, bucket: str, filename: str):
     if 'DateAdded' not in df.columns:
         df['DateAdded'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    st.write(df.sort_values(by='DateAdded',ascending=False).reset_index(drop=True).head(5))
+    #st.write(df.sort_values(by='DateAdded',ascending=False).reset_index(drop=True).head(5))
     # Normalize to lowercase
     df['German'] = df['German'].astype(str).str.strip().str.lower()
     df['English'] = df['English'].astype(str).str.strip().str.lower()
