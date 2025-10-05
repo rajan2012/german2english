@@ -10,6 +10,7 @@ from gtts import gTTS
 import base64
 import string
 import re
+from datetime import datetime
 
 from eng2germ import english_to_german_translation, german_to_english_translation
 from images3 import image_slideshow, image_slideshow2
@@ -48,18 +49,25 @@ def pronounce_word(word: str, rate: int = 150):
 def load_dictionary_s3_lower(bucket: str, filename: str) -> pd.DataFrame:
     df = load_data_s3(bucket, filename)
     if df is None or df.empty:
-        df = pd.DataFrame(columns=['German', 'English'])
+        df = pd.DataFrame(columns=['German', 'English', 'DateAdded'])
     # Normalize to lowercase
     df['German'] = df['German'].astype(str).str.strip().str.lower()
     df['English'] = df['English'].astype(str).str.strip().str.lower()
-    df = df.drop_duplicates(subset=['German', 'English']).reset_index(drop=True)
+    #df = df.drop_duplicates(subset=['German', 'English']).reset_index(drop=True)
     return df
 
 def save_dictionary_s3_lower(df: pd.DataFrame, bucket: str, filename: str):
     df = df.copy()
+    # Ensure columns exist
+    if 'DateAdded' not in df.columns:
+        df['DateAdded'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    st.write(df.sort_values(by='DateAdded',ascending=False).reset_index(drop=True).head(5))
+    # Normalize to lowercase
     df['German'] = df['German'].astype(str).str.strip().str.lower()
     df['English'] = df['English'].astype(str).str.strip().str.lower()
-    df = df.drop_duplicates(subset=['German', 'English']).reset_index(drop=True)
+    # Keep only latest entries for duplicates
+    df = df.drop_duplicates(subset=['German', 'English'], keep='last').reset_index(drop=True)
     save_data_s3(df, bucket, filename)
 
 # Preprocess sentence: remove punctuation/digits, keep umlauts, lowercase
@@ -91,7 +99,7 @@ def update_dictionary_auto(new_words, dictionary_df):
         if english_translation == word_lower:
             continue
         dictionary_df = pd.concat(
-            [dictionary_df, pd.DataFrame({'German': [word_lower], 'English': [english_translation]})],
+            [dictionary_df, pd.DataFrame({'German': [word_lower], 'English': [english_translation],'DateAdded': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")] })],
             ignore_index=True
         )
         added_words.append((word_lower, english_translation))
@@ -117,7 +125,7 @@ def update_dictionary_auto_eng2de(new_words, dictionary_df):
         if german_translation == word_lower:
             continue
         dictionary_df = pd.concat(
-            [dictionary_df, pd.DataFrame({'English': [word_lower], 'German': [german_translation]})],
+            [dictionary_df, pd.DataFrame({'English': [word_lower], 'German': [german_translation],'DateAdded': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")] })],
             ignore_index=True
         )
         added_words.append((word_lower, german_translation))
@@ -198,52 +206,90 @@ if translation_direction == 'German to English':
         try:
             english_word = translator.translate(german_word, dest='en', src='de').text.lower().strip()
             st.write(english_word)
+
             if st.button('Pronounce German Word22'):
                 tts = gTTS(text=german_word, lang='de')
                 tts.save("translated_word_temp3.mp3")
                 with open("translated_word_temp3.mp3", "rb") as f:
                     st.audio(f.read(), format='audio/mp3', start_time=0, autoplay=True)
-            exists = ((dictionary_df['German'].str.lower() == german_word) |
-                      (dictionary_df['English'].str.lower() == english_word))
-            if not exists.any():
-                new_entry = pd.DataFrame({'German': [german_word], 'English': [english_word]})
-                dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
-                save_dictionary_s3_lower(dictionary_df, bucket, filename)
-                st.write(f'Added: {german_word} -> {english_word}')
+
+            # normalize existing df
+            dictionary_df['German'] = dictionary_df['German'].astype(str).str.strip().str.lower()
+            dictionary_df['English'] = dictionary_df['English'].astype(str).str.strip().str.lower()
+
+            # check if word already exists
+            mask = (dictionary_df['German'] == german_word) & (dictionary_df['English'] == english_word)
+
+            if mask.any():
+                # ✅ update timestamp for existing entry
+                dictionary_df.loc[mask, 'DateAdded'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                #st.write(f'Updated timestamp for: {german_word} -> {english_word}')
             else:
-                st.write(f'The German word "{german_word}" or its English translation {english_word} already exists.')
+                # ✅ add as new entry with timestamp
+                new_entry = pd.DataFrame({
+                    'German': [german_word],
+                    'English': [english_word],
+                    'DateAdded': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
+                })
+                dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
+                st.write(f'Added: {german_word} -> {english_word}')
+
+            # save back to S3
+            save_dictionary_s3_lower(dictionary_df, bucket, filename)
+
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
+
 else:
     english_word = st.text_input('Enter an English word2:', '').strip().lower()
     if english_word:
         try:
             german_word = translator.translate(english_word, dest='de', src='en').text.lower().strip()
             st.write(german_word)
+
             if st.button('Pronounce Translated Word'):
                 tts = gTTS(text=german_word, lang='de')
                 tts.save("translated_word_temp.mp3")
                 with open("translated_word_temp.mp3", "rb") as f:
                     st.audio(f.read(), format='audio/mp3', start_time=0, autoplay=True)
-            exists = ((dictionary_df['English'].str.lower() == english_word) |
-                      (dictionary_df['German'].str.lower() == german_word))
-            if not exists.any():
-                new_entry = pd.DataFrame({'German': [german_word], 'English': [english_word]})
-                dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
-                save_dictionary_s3_lower(dictionary_df, bucket, filename)
-                st.write(f'Added: {english_word} -> {german_word}')
+
+            # normalize existing df
+            dictionary_df['German'] = dictionary_df['German'].astype(str).str.strip().str.lower()
+            dictionary_df['English'] = dictionary_df['English'].astype(str).str.strip().str.lower()
+
+            # check if word already exists
+            mask = (dictionary_df['English'] == english_word) & (dictionary_df['German'] == german_word)
+
+            if mask.any():
+                # ✅ update timestamp for existing entry
+                dictionary_df.loc[mask, 'DateAdded'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                #st.write(f'Updated timestamp for: {english_word} -> {german_word}')
             else:
-                st.write(f'The English word "{english_word}" or its German translation already exists.')
+                # ✅ add as new entry with timestamp
+                new_entry = pd.DataFrame({
+                    'German': [german_word],
+                    'English': [english_word],
+                    'dateadd': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
+                })
+                dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
+                st.write(f'Added: {english_word} -> {german_word}')
+
+            # save back to S3
+            save_dictionary_s3_lower(dictionary_df, bucket, filename)
+
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
 
 # ----------------- Table -----------------
 dictionary_df['German'] = dictionary_df['German'].astype(str).str.strip().str.lower()
 dictionary_df['English'] = dictionary_df['English'].astype(str).str.strip().str.lower()
-dictionary_df = dictionary_df.drop_duplicates(subset=['German', 'English']).reset_index(drop=True)
-display_df = dictionary_df.iloc[::-1][['English', 'German']]
+#dictionary_df = dictionary_df.drop_duplicates(subset=['German', 'English']).reset_index(drop=True)
+#display_df = dictionary_df.iloc[::-1][['English', 'German']]
+# Reset index temporarily to use original row order as tie-breaker
+display_df = dictionary_df.reset_index()
+display_df=display_df.sort_values(by=['DateAdded','index'],ascending=[False,False]).reset_index(drop=True)
 st.write("German English Dictionary")
-gb = GridOptionsBuilder.from_dataframe(display_df)
+gb = GridOptionsBuilder.from_dataframe(display_df[['English','German']])
 gb.configure_default_column(width=200)
 gridOptions = gb.build()
 AgGrid(display_df, gridOptions=gridOptions, height=400, theme='streamlit')
