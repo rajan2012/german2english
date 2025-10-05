@@ -295,38 +295,60 @@ gridOptions = gb.build()
 AgGrid(display_df, gridOptions=gridOptions, height=400, theme='streamlit')
 
 # ----------------- Flashcards -----------------
-if 'current_index' not in st.session_state:
-    st.session_state.current_index = len(display_df) - 1
+# ------------------ Prepare flashcards_df ------------------
+if 'flashcards_df' not in st.session_state:
+    # Sort by DateAdded descending and take the last 50 words
+    st.session_state.flashcards_df = display_df.sort_values(
+        by='DateAdded', ascending=False
+    ).head(200).reset_index(drop=True)
+
+flashcards_df = st.session_state.flashcards_df
+
+# Placeholder to update only flashcard
+flashcard_placeholder = st.empty()
+
+# ------------------ Session state ------------------
+if 'flash_index' not in st.session_state:
+    st.session_state.flash_index = 0
 if 'flipped' not in st.session_state:
     st.session_state.flipped = False
 
-def render_flashcard(index, flipped):
-    if index < 0 or index >= len(display_df):
-        st.markdown("### (No words in dictionary yet)")
+# ------------------ Flashcard render ------------------
+def render_flashcard():
+    if flashcards_df.empty:
+        flashcard_placeholder.markdown("### (No words in dictionary yet)")
         return
-    if flipped:
-        st.markdown(f"### {display_df.iloc[index]['English']}")
+
+    word_row = flashcards_df.iloc[st.session_state.flash_index]
+    # Show English if flipped, else German
+    if st.session_state.flipped:
+        flashcard_placeholder.markdown(f"### {word_row['English']}")
     else:
-        st.markdown(f"### {display_df.iloc[index]['German']}")
+        flashcard_placeholder.markdown(f"### {word_row['German']}")
 
 st.header("German-English Flashcards")
-render_flashcard(st.session_state.current_index, st.session_state.flipped)
+render_flashcard()
 
-if st.button("Flip"):
-    if not st.session_state.flipped:
-        st.session_state.flipped = True
-    else:
-        st.session_state.current_index -= 1
+# ------------------ Buttons ------------------
+col1, col2 = st.columns([1, 1])
+
+with col1:
+    if st.button("Flip"):
+        if not st.session_state.flipped:
+            st.session_state.flipped = True
+        else:
+            # Move to next word and reset flip
+            st.session_state.flash_index += 1
+            st.session_state.flipped = False
+            if st.session_state.flash_index >= len(flashcards_df):
+                st.session_state.flash_index = 0
+        render_flashcard()  # Update flashcard only
+
+with col2:
+    if st.button("Reset"):
+        st.session_state.flash_index = 0
         st.session_state.flipped = False
-        if st.session_state.current_index < 0:
-            st.session_state.current_index = len(display_df) - 1
-
-if st.button("Previous"):
-    st.session_state.current_index += 1
-    st.session_state.flipped = False
-    if st.session_state.current_index >= len(display_df):
-        st.session_state.current_index = 0
-
+        render_flashcard()
 # ----------------- Images from S3 -----------------
 image_slideshow(bucket_name_images)
 
