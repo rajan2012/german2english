@@ -381,14 +381,22 @@ with col3:
         word_row = flashcards_df.iloc[st.session_state.flash_index]
         german_word = word_row['German']
 
-        # Generate speech using gTTS
+        # Generate speech with gTTS
         tts = gTTS(german_word, lang='de')
         tts.save("temp.mp3")
 
-        # Show audio player (user can replay)
-        audio_file = open("temp.mp3", "rb")
-        audio_bytes = audio_file.read()
-        st.audio(audio_bytes, format="audio/mp3")
+        # Read audio bytes
+        with open("temp.mp3", "rb") as f:
+            audio_bytes = f.read()
+
+        # Encode to base64 for HTML autoplay
+        b64 = base64.b64encode(audio_bytes).decode()
+        audio_html = f"""
+            <audio autoplay>
+                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+            </audio>
+        """
+        st.markdown(audio_html, unsafe_allow_html=True)
 # ----------------- Images from S3 -----------------
 image_slideshow(bucket_name_images)
 
