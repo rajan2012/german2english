@@ -385,18 +385,10 @@ with col3:
         tts = gTTS(german_word, lang='de')
         tts.save("temp.mp3")
 
-        # Encode audio as base64
-        with open("temp.mp3", "rb") as f:
-            audio_bytes = f.read()
-        b64 = base64.b64encode(audio_bytes).decode()
-
-        # Just play audio (no second text display)
-        audio_html = f"""
-            <audio autoplay="true">
-                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-            </audio>
-        """
-        st.markdown(audio_html, unsafe_allow_html=True)
+        # Show audio player (user can replay)
+        audio_file = open("temp.mp3", "rb")
+        audio_bytes = audio_file.read()
+        st.audio(audio_bytes, format="audio/mp3")
 # ----------------- Images from S3 -----------------
 image_slideshow(bucket_name_images)
 
