@@ -303,12 +303,23 @@ AgGrid(display_df, gridOptions=gridOptions, height=400, theme='streamlit')
 
 # ----------------- Flashcards -----------------
 # ------------------ Prepare flashcards_df ------------------
+range_input = st.sidebar.text_input("Enter range (e.g., 0-100):", "0-200")
+
+# Parse the range
+try:
+    start_str, end_str = range_input.split("-")
+    start_idx = max(0, int(start_str))
+    end_idx = int(end_str)
+except:
+    st.sidebar.error("Invalid range format. Use start-end like 0-100")
+    start_idx, end_idx = 0, 200
+
 st.header("German-English Flashcards")
 if 'flashcards_df' not in st.session_state:
     # Sort by DateAdded descending and take the last 50 words
     st.session_state.flashcards_df = display_df.sort_values(
         by='DateAdded', ascending=False
-    ).head(200).reset_index(drop=True)
+    ).iloc[start_idx:end_idx].reset_index(drop=True)
 
 flashcards_df = st.session_state.flashcards_df
 
