@@ -160,10 +160,11 @@ if german_word_s:
         st.warning("Word not found in the dictionary.")
 
 # ---- German sentence -> auto add ----
-german_sentence = st.text_input("Enter a German sentence").strip().lower()
+german_sentence = st.text_input("Enter a German sentence",key="de_input1").strip().lower()
 if german_sentence:
     words = preprocess_sentence(german_sentence)
     st.write("Words extracted:", words)
+    st.session_state.de_input1 = ""
     try:
         dictionary_df, new_words_added = update_dictionary_auto(words, dictionary_df)
         save_dictionary_s3_lower(dictionary_df, bucket, filename)
@@ -176,10 +177,11 @@ if german_sentence:
         st.error(str(e))
 
 # ---- English sentence -> auto add ----
-english_sentence = st.text_input("Enter an English sentence").strip().lower()
+english_sentence = st.text_input("Enter an English sentence",key="eng_input1").strip().lower()
 if english_sentence:
     words = preprocess_sentence(english_sentence)
     st.write("Words extracted:", words)
+    #st.session_state.eng_input1 = ""
     try:
         dictionary_df, new_words_added = update_dictionary_auto_eng2de(words, dictionary_df)
         save_dictionary_s3_lower(dictionary_df, bucket, filename)
@@ -201,11 +203,12 @@ german_to_english_translation()
 translation_direction = st.radio('Select translation direction:', ('German to English', 'English to German'))
 
 if translation_direction == 'German to English':
-    german_word = st.text_input('Enter a German word:', '').strip().lower()
+    german_word = st.text_input('Enter a German word:', key="german_input").strip().lower()
     if german_word:
         try:
             english_word = translator.translate(german_word, dest='en', src='de').text.lower().strip()
             st.write(english_word)
+
 
             if st.button('Pronounce German Word22'):
                 tts = gTTS(text=german_word, lang='de')
@@ -236,16 +239,19 @@ if translation_direction == 'German to English':
 
             # save back to S3
             save_dictionary_s3_lower(dictionary_df, bucket, filename)
+            # clear box
 
         except Exception as e:
             st.error(f"Error occurred during translation: {e}")
 
 else:
-    english_word = st.text_input('Enter an English word2:', '').strip().lower()
+    english_word = st.text_input('Enter an English word2:', key="eng_input").strip().lower()
     if english_word:
         try:
             german_word = translator.translate(english_word, dest='de', src='en').text.lower().strip()
             st.write(german_word)
+            # ✅ Clear the text input after translation
+            #st.session_state.eng_input = ""
 
             if st.button('Pronounce Translated Word'):
                 tts = gTTS(text=german_word, lang='de')
@@ -315,13 +321,33 @@ if 'flipped' not in st.session_state:
     st.session_state.flipped = False
 
 # ------------------ Flashcard render ------------------
+
+# ------------------ Buttons ------------------
+
+if 'flashcards_df' not in st.session_state:
+    # Sort by DateAdded descending and take the last 200 words
+    st.session_state.flashcards_df = display_df.sort_values(
+        by='DateAdded', ascending=False
+    ).head(200).reset_index(drop=True)
+
+flashcards_df = st.session_state.flashcards_df
+
+# Placeholder to update only flashcard
+flashcard_placeholder = st.empty()
+
+# ------------------ Session state ------------------
+if 'flash_index' not in st.session_state:
+    st.session_state.flash_index = 0
+if 'flipped' not in st.session_state:
+    st.session_state.flipped = False
+
+# ------------------ Flashcard render ------------------
 def render_flashcard():
     if flashcards_df.empty:
         flashcard_placeholder.markdown("### (No words in dictionary yet)")
         return
 
     word_row = flashcards_df.iloc[st.session_state.flash_index]
-    # Show English if flipped, else German
     if st.session_state.flipped:
         flashcard_placeholder.markdown(f"### {word_row['English']}")
     else:
@@ -330,7 +356,7 @@ def render_flashcard():
 render_flashcard()
 
 # ------------------ Buttons ------------------
-col1, col2 = st.columns([1, 1])
+col1, col2, col3 = st.columns([1, 1, 1])  # added col3 for Pronounce
 
 with col1:
     if st.button("Flip"):
@@ -342,13 +368,35 @@ with col1:
             st.session_state.flipped = False
             if st.session_state.flash_index >= len(flashcards_df):
                 st.session_state.flash_index = 0
-        render_flashcard()  # Update flashcard only
+        render_flashcard()
 
 with col2:
     if st.button("Reset"):
         st.session_state.flash_index = 0
         st.session_state.flipped = False
         render_flashcard()
+
+with col3:
+    if st.button("Pronounce"):
+        word_row = flashcards_df.iloc[st.session_state.flash_index]
+        german_word = word_row['German']
+
+        # Generate speech using gTTS
+        tts = gTTS(german_word, lang='de')
+        tts.save("temp.mp3")
+
+        # Encode audio as base64
+        with open("temp.mp3", "rb") as f:
+            audio_bytes = f.read()
+        b64 = base64.b64encode(audio_bytes).decode()
+
+        # Just play audio (no second text display)
+        audio_html = f"""
+            <audio autoplay="true">
+                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+            </audio>
+        """
+        st.markdown(audio_html, unsafe_allow_html=True)
 # ----------------- Images from S3 -----------------
 image_slideshow(bucket_name_images)
 
