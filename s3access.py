@@ -1,3 +1,4 @@
+```python
 # this is for local
 import streamlit as st
 import pandas as pd
@@ -18,27 +19,44 @@ from images3 import image_slideshow, image_slideshow2
 from loaddata import load_data_s3, save_data_s3
 from streamlit_carousel import carousel
 from langdetect import detect, DetectorFactory
+
 DetectorFactory.seed = 0  # for consistent results
 
+
+# ============================================================
 # Initialize translator
+# ============================================================
+
 translator = Translator()
+
+
+# ============================================================
+# Text to speech functions
+# ============================================================
 
 def text_to_speech_url2(text: str) -> str:
     tts = gTTS(text=text, lang='de')
     tts.save("temp.mp3")
+
     with open("temp.mp3", "rb") as audio_file:
         audio_bytes = audio_file.read()
         audio_base64 = base64.b64encode(audio_bytes).decode()
+
     return f"data:audio/mp3;base64,{audio_base64}"
+
 
 def text_to_speech_url(text: str) -> str:
     tts = gTTS(text=text, lang='de')
+
     audio_bytes_io = BytesIO()
     tts.write_to_fp(audio_bytes_io)
     audio_bytes_io.seek(0)
+
     audio_bytes = audio_bytes_io.read()
     audio_base64 = base64.b64encode(audio_bytes).decode()
+
     return f"data:audio/mp3;base64,{audio_base64}"
+
 
 def pronounce_word(word: str, rate: int = 150):
     engine = pyttsx3.init()
@@ -46,361 +64,1181 @@ def pronounce_word(word: str, rate: int = 150):
     engine.say(word)
     engine.runAndWait()
 
+
+# ============================================================
 # Load dictionary from S3 with lowercase normalization
+# ============================================================
+
 def load_dictionary_s3_lower(bucket: str, filename: str) -> pd.DataFrame:
+
     df = load_data_s3(bucket, filename)
+
     if df is None or df.empty:
-        df = pd.DataFrame(columns=['German', 'English', 'DateAdded'])
+        df = pd.DataFrame(
+            columns=['German', 'English', 'DateAdded']
+        )
+
     # Normalize to lowercase
-    df['German'] = df['German'].astype(str).str.strip().str.lower()
-    df['English'] = df['English'].astype(str).str.strip().str.lower()
-    #df = df.drop_duplicates(subset=['German', 'English']).reset_index(drop=True)
+    df['German'] = (
+        df['German']
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
+    df['English'] = (
+        df['English']
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
     return df
 
-def save_dictionary_s3_lower(df: pd.DataFrame, bucket: str, filename: str):
+
+# ============================================================
+# Save dictionary to S3
+# ============================================================
+
+def save_dictionary_s3_lower(
+    df: pd.DataFrame,
+    bucket: str,
+    filename: str
+):
+
     df = df.copy()
-    # Ensure columns exist
+
+    # Ensure DateAdded exists
     if 'DateAdded' not in df.columns:
-        df['DateAdded'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        df['DateAdded'] = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
 
-    #st.write(df.sort_values(by='DateAdded',ascending=False).reset_index(drop=True).head(5))
     # Normalize to lowercase
-    df['German'] = df['German'].astype(str).str.strip().str.lower()
-    df['English'] = df['English'].astype(str).str.strip().str.lower()
-    # Keep only latest entries for duplicates
-    df = df.drop_duplicates(subset=['German', 'English'], keep='last').reset_index(drop=True)
-    save_data_s3(df, bucket, filename)
+    df['German'] = (
+        df['German']
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
 
-# Preprocess sentence: remove punctuation/digits, keep umlauts, lowercase
+    df['English'] = (
+        df['English']
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
+    # Keep only latest entries for duplicates
+    df = df.drop_duplicates(
+        subset=['German', 'English'],
+        keep='last'
+    ).reset_index(drop=True)
+
+    save_data_s3(
+        df,
+        bucket,
+        filename
+    )
+
+
+# ============================================================
+# Preprocess sentence
+# ============================================================
+
 def preprocess_sentence(sentence: str):
-    sentence = sentence.translate(str.maketrans('', '', string.punctuation))
-    sentence = re.sub(r'[^a-zA-ZäöüßÄÖÜ ]', '', sentence)
+
+    sentence = sentence.translate(
+        str.maketrans('', '', string.punctuation)
+    )
+
+    sentence = re.sub(
+        r'[^a-zA-ZäöüßÄÖÜ ]',
+        '',
+        sentence
+    )
+
     sentence = sentence.lower()
+
     words = sentence.split()
-    words = [w.strip() for w in words if len(w) >= 3]
+
+    words = [
+        w.strip()
+        for w in words
+        if len(w) >= 3
+    ]
+
     return words
 
+
+# ============================================================
 # Auto-add German -> English
-def update_dictionary_auto(new_words, dictionary_df):
+# ============================================================
+
+def update_dictionary_auto(
+    new_words,
+    dictionary_df
+):
+
     added_words = []
-    english_count = sum(1 for word in new_words if detect(word) == 'en')
-    if english_count >= 50 or english_count == len(new_words):
-        raise ValueError("The entered sentence appears to be English. Please enter a German sentence.")
+
+    english_count = sum(
+        1
+        for word in new_words
+        if detect(word) == 'en'
+    )
+
+    if (
+        english_count >= 50
+        or english_count == len(new_words)
+    ):
+        raise ValueError(
+            "The entered sentence appears to be English. "
+            "Please enter a German sentence."
+        )
+
     for word in new_words:
+
         word_lower = word.strip().lower()
-        if word_lower in dictionary_df['German'].str.lower().values:
+
+        if word_lower in dictionary_df[
+            'German'
+        ].str.lower().values:
             continue
+
         try:
-            english_translation = translator.translate(word_lower, src='de', dest='en').text.lower().strip()
+            english_translation = translator.translate(
+                word_lower,
+                src='de',
+                dest='en'
+            ).text.lower().strip()
+
         except:
             continue
+
         # Skip if translation already exists
-        if english_translation in dictionary_df['English'].str.lower().values:
+        if english_translation in dictionary_df[
+            'English'
+        ].str.lower().values:
             continue
+
         if english_translation == word_lower:
             continue
+
         dictionary_df = pd.concat(
-            [dictionary_df, pd.DataFrame({'German': [word_lower], 'English': [english_translation],'DateAdded': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")] })],
+            [
+                dictionary_df,
+                pd.DataFrame({
+                    'German': [word_lower],
+                    'English': [english_translation],
+                    'DateAdded': [
+                        datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        )
+                    ]
+                })
+            ],
             ignore_index=True
         )
-        added_words.append((word_lower, english_translation))
+
+        added_words.append(
+            (
+                word_lower,
+                english_translation
+            )
+        )
+
     return dictionary_df, added_words
 
+
+# ============================================================
 # Auto-add English -> German
-def update_dictionary_auto_eng2de(new_words, dictionary_df):
+# ============================================================
+
+def update_dictionary_auto_eng2de(
+    new_words,
+    dictionary_df
+):
+
     added_words = []
-    german_count = sum(1 for word in new_words if detect(word) == 'de' or any(c in word for c in 'äöüß'))
-    if german_count >= 50 or german_count == len(new_words):
-        raise ValueError("Please enter an English sentence, not German.")
+
+    german_count = sum(
+        1
+        for word in new_words
+        if detect(word) == 'de'
+        or any(
+            c in word
+            for c in 'äöüß'
+        )
+    )
+
+    if (
+        german_count >= 50
+        or german_count == len(new_words)
+    ):
+        raise ValueError(
+            "Please enter an English sentence, not German."
+        )
+
     for word in new_words:
+
         word_lower = word.strip().lower()
-        if word_lower in dictionary_df['English'].str.lower().values:
+
+        if word_lower in dictionary_df[
+            'English'
+        ].str.lower().values:
             continue
+
         try:
-            german_translation = translator.translate(word_lower, src='en', dest='de').text.lower().strip()
+            german_translation = translator.translate(
+                word_lower,
+                src='en',
+                dest='de'
+            ).text.lower().strip()
+
         except:
             continue
+
         # Skip if translation already exists
-        if german_translation in dictionary_df['German'].str.lower().values:
+        if german_translation in dictionary_df[
+            'German'
+        ].str.lower().values:
             continue
+
         if german_translation == word_lower:
             continue
+
         dictionary_df = pd.concat(
-            [dictionary_df, pd.DataFrame({'English': [word_lower], 'German': [german_translation],'DateAdded': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")] })],
+            [
+                dictionary_df,
+                pd.DataFrame({
+                    'English': [word_lower],
+                    'German': [german_translation],
+                    'DateAdded': [
+                        datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        )
+                    ]
+                })
+            ],
             ignore_index=True
         )
-        added_words.append((word_lower, german_translation))
+
+        added_words.append(
+            (
+                word_lower,
+                german_translation
+            )
+        )
+
     return dictionary_df, added_words
 
-# ----------------- Constants -----------------
+
+# ============================================================
+# Constants
+# ============================================================
+
 bucket = 'test22-rajan'
+
 filename = 'german_english_dictionary.csv'
+
 images_path = r"C:\Users\User\Documents\german\image"
+
 bucket_name_images = 'image-rajan'
 
-# ----------------- Load dictionary -----------------
-dictionary_df = load_dictionary_s3_lower(bucket, filename)
 
-# ----------------- Session State -----------------
+# ============================================================
+# Load dictionary
+# ============================================================
+
+dictionary_df = load_dictionary_s3_lower(
+    bucket,
+    filename
+)
+
+
+# ============================================================
+# Session State
+# ============================================================
+
 if 'current_index' not in st.session_state:
     st.session_state.current_index = 0
+
 if 'flipped' not in st.session_state:
     st.session_state.flipped = False
 
-# ----------------- UI -----------------
+
+# ============================================================
+# UI
+# ============================================================
+
 st.title('Translation Dictionary')
 
-# ---- Search German word ----
-german_word_s = st.text_input("Enter a German word for search:").strip().lower()
+
+# ============================================================
+# Search German word
+# ============================================================
+
+german_word_s = st.text_input(
+    "Enter a German word for search:"
+).strip().lower()
+
 if german_word_s:
-    match = dictionary_df[dictionary_df['German'].str.lower() == german_word_s]
+
+    match = dictionary_df[
+        dictionary_df['German'].str.lower()
+        == german_word_s
+    ]
+
     if not match.empty:
+
         english_translation = match.iloc[0]['English']
-        st.success(f"{english_translation}")
+
+        st.success(
+            f"{english_translation}"
+        )
+
     else:
-        st.warning("Word not found in the dictionary.")
 
-# ---- German sentence -> auto add ----
-german_sentence = st.text_input("Enter a German sentence",key="de_input1").strip().lower()
+        st.warning(
+            "Word not found in the dictionary."
+        )
+
+
+# ============================================================
+# German sentence -> auto add
+# ============================================================
+
+german_sentence = st.text_input(
+    "Enter a German sentence",
+    key="de_input1"
+).strip().lower()
+
 if german_sentence:
-    words = preprocess_sentence(german_sentence)
-    st.write("Words extracted:", words)
-    st.session_state.de_input1 = ""
-    try:
-        dictionary_df, new_words_added = update_dictionary_auto(words, dictionary_df)
-        save_dictionary_s3_lower(dictionary_df, bucket, filename)
-        if new_words_added:
-            display_text = "\n".join([f"{de} → {en}" for de, en in new_words_added])
-            st.text("New words added:\n" + display_text)
-        else:
-            st.info("All words already exist in dictionary.")
-    except ValueError as e:
-        st.error(str(e))
 
-# ---- English sentence -> auto add ----
-english_sentence = st.text_input("Enter an English sentence",key="eng_input1").strip().lower()
+    words = preprocess_sentence(
+        german_sentence
+    )
+
+    st.write(
+        "Words extracted:",
+        words
+    )
+
+    try:
+
+        dictionary_df, new_words_added = (
+            update_dictionary_auto(
+                words,
+                dictionary_df
+            )
+        )
+
+        save_dictionary_s3_lower(
+            dictionary_df,
+            bucket,
+            filename
+        )
+
+        if new_words_added:
+
+            display_text = "\n".join(
+                [
+                    f"{de} → {en}"
+                    for de, en
+                    in new_words_added
+                ]
+            )
+
+            st.text(
+                "New words added:\n"
+                + display_text
+            )
+
+        else:
+
+            st.info(
+                "All words already exist in dictionary."
+            )
+
+    except ValueError as e:
+
+        st.error(
+            str(e)
+        )
+
+
+# ============================================================
+# English sentence -> auto add
+# ============================================================
+
+english_sentence = st.text_input(
+    "Enter an English sentence",
+    key="eng_input1"
+).strip().lower()
+
 if english_sentence:
-    words = preprocess_sentence(english_sentence)
-    st.write("Words extracted:", words)
-    #st.session_state.eng_input1 = ""
-    try:
-        dictionary_df, new_words_added = update_dictionary_auto_eng2de(words, dictionary_df)
-        save_dictionary_s3_lower(dictionary_df, bucket, filename)
-        if new_words_added:
-            display_text = "\n".join([f"{en} → {de}" for en, de in new_words_added])
-            st.text("New words added:\n" + display_text)
-        else:
-            st.info("All words already exist in dictionary.")
-    except ValueError as e:
-        st.error(str(e))
-    if st.button("Pronounce15"):
-        pronounce_word(english_sentence)
 
+    words = preprocess_sentence(
+        english_sentence
+    )
+
+    st.write(
+        "Words extracted:",
+        words
+    )
+
+    try:
+
+        dictionary_df, new_words_added = (
+            update_dictionary_auto_eng2de(
+                words,
+                dictionary_df
+            )
+        )
+
+        save_dictionary_s3_lower(
+            dictionary_df,
+            bucket,
+            filename
+        )
+
+        if new_words_added:
+
+            display_text = "\n".join(
+                [
+                    f"{en} → {de}"
+                    for en, de
+                    in new_words_added
+                ]
+            )
+
+            st.text(
+                "New words added:\n"
+                + display_text
+            )
+
+        else:
+
+            st.info(
+                "All words already exist in dictionary."
+            )
+
+    except ValueError as e:
+
+        st.error(
+            str(e)
+        )
+
+    if st.button("Pronounce15"):
+
+        pronounce_word(
+            english_sentence
+        )
+
+
+# ============================================================
 # Run custom modules
+# ============================================================
+
 english_to_german_translation()
+
 german_to_english_translation()
 
-# ---- Manual translation ----
-translation_direction = st.radio('Select translation direction:', ('German to English', 'English to German'))
+
+# ============================================================
+# Manual translation
+# ============================================================
+
+translation_direction = st.radio(
+    'Select translation direction:',
+    (
+        'German to English',
+        'English to German'
+    )
+)
+
+
+# ============================================================
+# German -> English
+# ============================================================
 
 if translation_direction == 'German to English':
-    german_word = st.text_input('Enter a German word:', key="german_input").strip().lower()
-    if german_word:
+
+    # --------------------------------------------------------
+    # FORM
+    #
+    # clear_on_submit=True means:
+    #
+    # Enter German word
+    #        ↓
+    # Press Enter
+    #        ↓
+    # Translate
+    #        ↓
+    # Save to dictionary
+    #        ↓
+    # Clear textbox
+    #
+    # --------------------------------------------------------
+
+    with st.form(
+        key="german_translation_form",
+        clear_on_submit=True
+    ):
+
+        german_word = st.text_input(
+            'Enter a German word:',
+            key="german_input"
+        )
+
+        german_submit = st.form_submit_button(
+            "Translate / Save"
+        )
+
+    # --------------------------------------------------------
+    # Process translation only after Enter / Submit
+    # --------------------------------------------------------
+
+    if german_submit and german_word.strip():
+
+        german_word = (
+            german_word
+            .strip()
+            .lower()
+        )
+
         try:
-            english_word = translator.translate(german_word, dest='en', src='de').text.lower().strip()
-            st.write(english_word)
 
+            # ------------------------------------------------
+            # Translate German -> English
+            # ------------------------------------------------
 
-            if st.button('Pronounce German Word22'):
-                tts = gTTS(text=german_word, lang='de')
-                tts.save("translated_word_temp3.mp3")
-                with open("translated_word_temp3.mp3", "rb") as f:
-                    st.audio(f.read(), format='audio/mp3', start_time=0, autoplay=True)
+            english_word = translator.translate(
+                german_word,
+                dest='en',
+                src='de'
+            ).text.lower().strip()
 
-            # normalize existing df
-            dictionary_df['German'] = dictionary_df['German'].astype(str).str.strip().str.lower()
-            dictionary_df['English'] = dictionary_df['English'].astype(str).str.strip().str.lower()
+            # Show translation
+            st.success(
+                f"{german_word} → {english_word}"
+            )
 
-            # check if word already exists
-            mask = (dictionary_df['German'] == german_word) & (dictionary_df['English'] == english_word)
+            # ------------------------------------------------
+            # Pronounce German word
+            # ------------------------------------------------
+
+            tts = gTTS(
+                text=german_word,
+                lang='de'
+            )
+
+            tts.save(
+                "translated_word_temp3.mp3"
+            )
+
+            with open(
+                "translated_word_temp3.mp3",
+                "rb"
+            ) as f:
+
+                audio_bytes = f.read()
+
+            st.audio(
+                audio_bytes,
+                format='audio/mp3',
+                autoplay=True
+            )
+
+            # ------------------------------------------------
+            # Normalize existing dictionary
+            # ------------------------------------------------
+
+            dictionary_df['German'] = (
+                dictionary_df['German']
+                .astype(str)
+                .str.strip()
+                .str.lower()
+            )
+
+            dictionary_df['English'] = (
+                dictionary_df['English']
+                .astype(str)
+                .str.strip()
+                .str.lower()
+            )
+
+            # ------------------------------------------------
+            # Check if exact German + English pair exists
+            # ------------------------------------------------
+
+            mask = (
+                (dictionary_df['German'] == german_word)
+                &
+                (dictionary_df['English'] == english_word)
+            )
+
+            # ------------------------------------------------
+            # Existing entry
+            # ------------------------------------------------
 
             if mask.any():
-                # ✅ update timestamp for existing entry
-                dictionary_df.loc[mask, 'DateAdded'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                #st.write(f'Updated timestamp for: {german_word} -> {english_word}')
+
+                dictionary_df.loc[
+                    mask,
+                    'DateAdded'
+                ] = datetime.now().strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+
+                st.info(
+                    f"Already in dictionary: "
+                    f"{german_word} → {english_word}"
+                )
+
+            # ------------------------------------------------
+            # New entry
+            # ------------------------------------------------
+
             else:
-                # ✅ add as new entry with timestamp
+
                 new_entry = pd.DataFrame({
                     'German': [german_word],
                     'English': [english_word],
-                    'DateAdded': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
+                    'DateAdded': [
+                        datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        )
+                    ]
                 })
-                dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
-                st.write(f'Added: {german_word} -> {english_word}')
 
-            # save back to S3
-            save_dictionary_s3_lower(dictionary_df, bucket, filename)
-            # clear box
+                dictionary_df = pd.concat(
+                    [
+                        dictionary_df,
+                        new_entry
+                    ],
+                    ignore_index=True
+                )
+
+                st.success(
+                    f"Added: "
+                    f"{german_word} → {english_word}"
+                )
+
+            # ------------------------------------------------
+            # SAVE TO S3
+            # ------------------------------------------------
+
+            save_dictionary_s3_lower(
+                dictionary_df,
+                bucket,
+                filename
+            )
+
+            # ------------------------------------------------
+            # IMPORTANT:
+            #
+            # Because clear_on_submit=True was used above,
+            # the textbox will now be empty automatically.
+            # ------------------------------------------------
 
         except Exception as e:
-            st.error(f"Error occurred during translation: {e}")
+
+            st.error(
+                f"Error occurred during translation: {e}"
+            )
+
+
+# ============================================================
+# English -> German
+# ============================================================
 
 else:
-    english_word = st.text_input('Enter an English word2:', key="eng_input").strip().lower()
-    if english_word:
+
+    # --------------------------------------------------------
+    # FORM
+    #
+    # clear_on_submit=True means:
+    #
+    # Enter English word
+    #        ↓
+    # Press Enter
+    #        ↓
+    # Translate
+    #        ↓
+    # Save to dictionary
+    #        ↓
+    # Clear textbox
+    #
+    # --------------------------------------------------------
+
+    with st.form(
+        key="english_translation_form",
+        clear_on_submit=True
+    ):
+
+        english_word = st.text_input(
+            'Enter an English word:',
+            key="eng_input"
+        )
+
+        english_submit = st.form_submit_button(
+            "Translate / Save"
+        )
+
+    # --------------------------------------------------------
+    # Process translation only after Enter / Submit
+    # --------------------------------------------------------
+
+    if english_submit and english_word.strip():
+
+        english_word = (
+            english_word
+            .strip()
+            .lower()
+        )
+
         try:
-            german_word = translator.translate(english_word, dest='de', src='en').text.lower().strip()
-            st.write(german_word)
-            # ✅ Clear the text input after translation
-            #st.session_state.eng_input = ""
 
-            if st.button('Pronounce Translated Word'):
-                tts = gTTS(text=german_word, lang='de')
-                tts.save("translated_word_temp.mp3")
-                with open("translated_word_temp.mp3", "rb") as f:
-                    st.audio(f.read(), format='audio/mp3', start_time=0, autoplay=True)
+            # ------------------------------------------------
+            # Translate English -> German
+            # ------------------------------------------------
 
-            # normalize existing df
-            dictionary_df['German'] = dictionary_df['German'].astype(str).str.strip().str.lower()
-            dictionary_df['English'] = dictionary_df['English'].astype(str).str.strip().str.lower()
+            german_word = translator.translate(
+                english_word,
+                dest='de',
+                src='en'
+            ).text.lower().strip()
 
-            # check if word already exists
-            mask = (dictionary_df['English'] == english_word) & (dictionary_df['German'] == german_word)
+            # Show translation
+            st.success(
+                f"{english_word} → {german_word}"
+            )
+
+            # ------------------------------------------------
+            # Pronounce translated German word
+            # ------------------------------------------------
+
+            tts = gTTS(
+                text=german_word,
+                lang='de'
+            )
+
+            tts.save(
+                "translated_word_temp.mp3"
+            )
+
+            with open(
+                "translated_word_temp.mp3",
+                "rb"
+            ) as f:
+
+                audio_bytes = f.read()
+
+            st.audio(
+                audio_bytes,
+                format='audio/mp3',
+                autoplay=True
+            )
+
+            # ------------------------------------------------
+            # Normalize existing dictionary
+            # ------------------------------------------------
+
+            dictionary_df['German'] = (
+                dictionary_df['German']
+                .astype(str)
+                .str.strip()
+                .str.lower()
+            )
+
+            dictionary_df['English'] = (
+                dictionary_df['English']
+                .astype(str)
+                .str.strip()
+                .str.lower()
+            )
+
+            # ------------------------------------------------
+            # Check if exact English + German pair exists
+            # ------------------------------------------------
+
+            mask = (
+                (dictionary_df['English'] == english_word)
+                &
+                (dictionary_df['German'] == german_word)
+            )
+
+            # ------------------------------------------------
+            # Existing entry
+            # ------------------------------------------------
 
             if mask.any():
-                # ✅ update timestamp for existing entry
-                dictionary_df.loc[mask, 'DateAdded'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                #st.write(f'Updated timestamp for: {english_word} -> {german_word}')
+
+                dictionary_df.loc[
+                    mask,
+                    'DateAdded'
+                ] = datetime.now().strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+
+                st.info(
+                    f"Already in dictionary: "
+                    f"{english_word} → {german_word}"
+                )
+
+            # ------------------------------------------------
+            # New entry
+            # ------------------------------------------------
+
             else:
-                # ✅ add as new entry with timestamp
+
                 new_entry = pd.DataFrame({
                     'German': [german_word],
                     'English': [english_word],
-                    'DateAdded': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
+                    'DateAdded': [
+                        datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        )
+                    ]
                 })
-                dictionary_df = pd.concat([dictionary_df, new_entry], ignore_index=True)
-                st.write(f'Added: {english_word} -> {german_word}')
 
-            # save back to S3
-            save_dictionary_s3_lower(dictionary_df, bucket, filename)
+                dictionary_df = pd.concat(
+                    [
+                        dictionary_df,
+                        new_entry
+                    ],
+                    ignore_index=True
+                )
+
+                st.success(
+                    f"Added: "
+                    f"{english_word} → {german_word}"
+                )
+
+            # ------------------------------------------------
+            # SAVE TO S3
+            # ------------------------------------------------
+
+            save_dictionary_s3_lower(
+                dictionary_df,
+                bucket,
+                filename
+            )
+
+            # ------------------------------------------------
+            # IMPORTANT:
+            #
+            # clear_on_submit=True automatically clears
+            # the English textbox.
+            # ------------------------------------------------
 
         except Exception as e:
-            st.error(f"Error occurred during translation: {e}")
 
-# ----------------- Table -----------------
-dictionary_df['German'] = dictionary_df['German'].astype(str).str.strip().str.lower()
-dictionary_df['English'] = dictionary_df['English'].astype(str).str.strip().str.lower()
-#dictionary_df = dictionary_df.drop_duplicates(subset=['German', 'English']).reset_index(drop=True)
-#display_df = dictionary_df.iloc[::-1][['English', 'German']]
-# Reset index temporarily to use original row order as tie-breaker
+            st.error(
+                f"Error occurred during translation: {e}"
+            )
+
+
+# ============================================================
+# Table
+# ============================================================
+
+dictionary_df['German'] = (
+    dictionary_df['German']
+    .astype(str)
+    .str.strip()
+    .str.lower()
+)
+
+dictionary_df['English'] = (
+    dictionary_df['English']
+    .astype(str)
+    .str.strip()
+    .str.lower()
+)
+
+
+# Reset index temporarily to use original row order
+# as tie-breaker
+
 display_df = dictionary_df.reset_index()
-display_df=display_df.sort_values(by=['DateAdded','index'],ascending=[False,False]).reset_index(drop=True)
-st.write("German English Dictionary")
-gb = GridOptionsBuilder.from_dataframe(display_df[['English','German']])
-gb.configure_default_column(width=200)
+
+display_df = display_df.sort_values(
+    by=['DateAdded', 'index'],
+    ascending=[False, False]
+).reset_index(drop=True)
+
+
+st.write(
+    "German English Dictionary"
+)
+
+
+gb = GridOptionsBuilder.from_dataframe(
+    display_df[['English', 'German']]
+)
+
+gb.configure_default_column(
+    width=200
+)
+
 gridOptions = gb.build()
-AgGrid(display_df, gridOptions=gridOptions, height=400, theme='streamlit')
 
-# ----------------- Flashcards -----------------
-# ------------------ Prepare flashcards_df ------------------
-range_input = st.sidebar.text_input("Enter range (e.g., 0-100):", "0-200")
 
-# Parse the range
+AgGrid(
+    display_df,
+    gridOptions=gridOptions,
+    height=400,
+    theme='streamlit'
+)
+
+
+# ============================================================
+# Flashcards
+# ============================================================
+
+range_input = st.sidebar.text_input(
+    "Enter range (e.g., 0-100):",
+    "0-200"
+)
+
+
+# ============================================================
+# Parse range
+# ============================================================
+
 try:
-    start_str, end_str = range_input.split("-")
-    start_idx = max(0, int(start_str))
-    end_idx = int(end_str)
-except:
-    st.sidebar.error("Invalid range format. Use start-end like 0-100")
-    start_idx, end_idx = 0, 200
 
-#st.write(start_idx,end_idx)
-st.header("German-English Flashcards")
+    start_str, end_str = range_input.split("-")
+
+    start_idx = max(
+        0,
+        int(start_str)
+    )
+
+    end_idx = int(end_str)
+
+except:
+
+    st.sidebar.error(
+        "Invalid range format. Use start-end like 0-100"
+    )
+
+    start_idx = 0
+    end_idx = 200
+
+
+st.header(
+    "German-English Flashcards"
+)
+
+
 # Always update flashcards_df according to range
-flashcards_df = display_df.sort_values(by='DateAdded', ascending=False).iloc[start_idx:end_idx].reset_index(drop=True)
+
+flashcards_df = (
+    display_df
+    .sort_values(
+        by='DateAdded',
+        ascending=False
+    )
+    .iloc[start_idx:end_idx]
+    .reset_index(drop=True)
+)
+
 st.session_state.flashcards_df = flashcards_df
 
-#flashcards_df = st.session_state.flashcards_df
 
+# ============================================================
 # Placeholder to update only flashcard
+# ============================================================
+
 flashcard_placeholder = st.empty()
 
-# ------------------ Session state ------------------
+
+# ============================================================
+# Flashcard session state
+# ============================================================
+
 if 'flash_index' not in st.session_state:
     st.session_state.flash_index = 0
+
 if 'flipped' not in st.session_state:
     st.session_state.flipped = False
 
-# ------------------ Flashcard render ------------------
+
+# ============================================================
+# Flashcard render
+# ============================================================
+
 def render_flashcard():
+
     if flashcards_df.empty:
-        flashcard_placeholder.markdown("### (No words in dictionary yet)")
+
+        flashcard_placeholder.markdown(
+            "### (No words in dictionary yet)"
+        )
+
         return
 
-    word_row = flashcards_df.iloc[st.session_state.flash_index]
+    word_row = flashcards_df.iloc[
+        st.session_state.flash_index
+    ]
+
     if st.session_state.flipped:
-        flashcard_placeholder.markdown(f"### {word_row['English']}")
+
+        flashcard_placeholder.markdown(
+            f"### {word_row['English']}"
+        )
+
     else:
-        flashcard_placeholder.markdown(f"### {word_row['German']}")
+
+        flashcard_placeholder.markdown(
+            f"### {word_row['German']}"
+        )
+
 
 render_flashcard()
 
-# ------------------ Buttons ------------------
-col1, col2, col3 = st.columns([1, 1, 1])  # added col3 for Pronounce
+
+# ============================================================
+# Flashcard buttons
+# ============================================================
+
+col1, col2, col3 = st.columns(
+    [1, 1, 1]
+)
+
+
+# ============================================================
+# Flip
+# ============================================================
 
 with col1:
+
     if st.button("Flip"):
+
         if not st.session_state.flipped:
+
             st.session_state.flipped = True
+
         else:
-            # Move to next word and reset flip
+
             st.session_state.flash_index += 1
+
             st.session_state.flipped = False
-            if st.session_state.flash_index >= len(flashcards_df):
+
+            if (
+                st.session_state.flash_index
+                >= len(flashcards_df)
+            ):
+
                 st.session_state.flash_index = 0
+
         render_flashcard()
+
+
+# ============================================================
+# Reset
+# ============================================================
 
 with col2:
+
     if st.button("Reset"):
+
         st.session_state.flash_index = 0
+
         st.session_state.flipped = False
+
         render_flashcard()
 
+
+# ============================================================
+# Pronounce flashcard
+# ============================================================
+
 with col3:
+
     if st.button("Pronounce"):
-        word_row = flashcards_df.iloc[st.session_state.flash_index]
+
+        word_row = flashcards_df.iloc[
+            st.session_state.flash_index
+        ]
+
         german_word = word_row['German']
 
         # Generate speech using gTTS
-        tts = gTTS(german_word, lang='de')
-        tts.save("temp.mp3")
 
-        # Show audio player (user can replay)
-        audio_file = open("temp.mp3", "rb")
+        tts = gTTS(
+            german_word,
+            lang='de'
+        )
+
+        tts.save(
+            "temp.mp3"
+        )
+
+        audio_file = open(
+            "temp.mp3",
+            "rb"
+        )
+
         audio_bytes = audio_file.read()
-        st.audio(audio_bytes, format="audio/mp3")
+
+        st.audio(
+            audio_bytes,
+            format="audio/mp3"
+        )
 
 
-# ----------------- Images from S3 -----------------
-image_slideshow(bucket_name_images)
+# ============================================================
+# Images from S3
+# ============================================================
 
-# ----------------- Footer -----------------
+image_slideshow(
+    bucket_name_images
+)
+
+
+# ============================================================
+# Footer
+# ============================================================
+
 footer = """
-   <style>
-   .footer {
-       position: fixed;
-       left: 0;
-       bottom: 0;
-       width: 100%;
-       background-color: transparent;
-       text-align: center;
-       padding: 10px;
-       z-index: 1000;
-   }
-   </style>
-   <div class="footer">
-       <p>&copy; 2024 rajan | <a href="mailto:rajansah8723@gmail.com">email</a> | 
-       <a href="https://www.linkedin.com/in/rajan-sah-0a145495">LinkedIn</a></p>
-   </div>
+<style>
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: transparent;
+    text-align: center;
+    padding: 10px;
+    z-index: 1000;
+}
+
+</style>
+
+<div class="footer">
+
+<p>
+&copy; 2024 rajan |
+<a href="mailto:rajansah8723@gmail.com">
+email
+</a>
+|
+<a href="https://www.linkedin.com/in/rajan-sah-0a145495">
+LinkedIn
+</a>
+</p>
+
+</div>
 """
-st.markdown(footer, unsafe_allow_html=True)
+
+st.markdown(
+    footer,
+    unsafe_allow_html=True
+)
+```
