@@ -1,7 +1,7 @@
 
 streamlit
 pandas
-googletrans==3.1.0a0
+googletrans==4.0.0rc1
 pyttsx3==2.7
 PyGithub==1.55
 streamlit-aggrid==1.0.5
